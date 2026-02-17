@@ -1,8 +1,8 @@
 package com.almedin.modules.affiliates.infrastructure.web;
 
+import com.almedin.modules.affiliates.application.dto.AffiliateRequest;
+import com.almedin.modules.affiliates.application.dto.AffiliateResponse;
 import com.almedin.modules.affiliates.application.service.AffiliateService;
-import com.almedin.modules.affiliates.infrastructure.mappers.AffiliateMapper;
-import com.almedin.modules.affiliates.infrastructure.web.dto.AffiliateDTO;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
@@ -10,6 +10,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
+
 import java.util.List;
 
 @Path("/api/affiliates")
@@ -21,39 +22,31 @@ public class AffiliateResource {
     @Inject
     AffiliateService affiliateService;
 
-    @Inject
-    AffiliateMapper affiliateMapper;
-
     @GET
     @Operation(summary = "Obtener todos los afiliados")
-    public List<AffiliateDTO> getAll() {
-        return affiliateMapper.toDTOList(affiliateService.findAll());
+    public List<AffiliateResponse> getAll() {
+        return affiliateService.findAll();
     }
 
     @GET
     @Path("/{id}")
     @Operation(summary = "Obtener un afiliado por ID")
-    public AffiliateDTO getById(@PathParam("id") Long id) {
-        return affiliateMapper.toDTO(affiliateService.findById(id));
+    public AffiliateResponse getById(@PathParam("id") Long id) {
+        return affiliateService.findById(id);
     }
 
     @POST
     @Operation(summary = "Crear un nuevo afiliado")
-    public Response create(@Valid AffiliateDTO dto) {
-        var affiliate = affiliateMapper.toEntity(dto);
-        var created = affiliateService.create(affiliate);
-        return Response.status(Response.Status.CREATED)
-                .entity(affiliateMapper.toDTO(created))
-                .build();
+    public Response create(@Valid AffiliateRequest request) {
+        AffiliateResponse created = affiliateService.create(request);
+        return Response.status(Response.Status.CREATED).entity(created).build();
     }
 
     @PUT
     @Path("/{id}")
     @Operation(summary = "Actualizar un afiliado existente")
-    public AffiliateDTO update(@PathParam("id") Long id, @Valid AffiliateDTO dto) {
-        var affiliateData = affiliateMapper.toEntity(dto);
-        var updated = affiliateService.update(id, affiliateData);
-        return affiliateMapper.toDTO(updated);
+    public AffiliateResponse update(@PathParam("id") Long id, @Valid AffiliateRequest request) {
+        return affiliateService.update(id, request);
     }
 
     @DELETE
