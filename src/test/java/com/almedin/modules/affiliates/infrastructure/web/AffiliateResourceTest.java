@@ -1,0 +1,108 @@
+package com.almedin.modules.affiliates.infrastructure.web;
+
+import io.quarkus.test.junit.QuarkusTest;
+import io.restassured.http.ContentType;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.*;
+
+@QuarkusTest
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+class AffiliateResourceTest {
+
+    private static final String BASE_PATH = "/api/affiliates";
+
+    private static final String VALID_BODY = """
+            {
+                "firstName": "Carlos",
+                "lastName": "López",
+                "dni": "11223344",
+                "email": "carlos@email.com",
+                "healthInsuranceCode": "OS-003"
+            }
+            """;
+
+    @Test
+    @Order(1)
+    void getAll_debeRetornar200() {
+        given()
+                .when().get(BASE_PATH)
+                .then()
+                .statusCode(200)
+                .contentType(ContentType.JSON);
+    }
+
+    @Test
+    @Order(2)
+    void create_conDatosValidos_debeRetornar201() {
+        given()
+                .contentType(ContentType.JSON)
+                .body(VALID_BODY)
+                .when()
+                .post(BASE_PATH)
+                .then()
+                .statusCode(201)
+                .body("dni", equalTo("11223344"))
+                .body("email", equalTo("carlos@email.com"))
+                .body("id", notNullValue());
+    }
+
+    @Test
+    @Order(3)
+    void create_conDniDuplicado_debeRetornar409() {
+        given()
+                .contentType(ContentType.JSON)
+                .body(VALID_BODY) // mismo DNI que el test anterior
+                .when()
+                .post(BASE_PATH)
+                .then()
+                .statusCode(409)
+                .body("message", containsString("DNI"));
+    }
+
+    @Test
+    @Order(4)
+    void create_conEmailInvalido_debeRetornar400() {
+        String bodyInvalido = """
+                {
+                    "firstName": "Ana",
+                    "lastName": "Ruiz",
+                    "dni": "55667788",
+                    "email": "no-es-un-email",
+                    "healthInsuranceCode": "OS-004"
+                }
+                """;
+
+        given()
+                .contentType(ContentType.JSON)
+                .body(bodyInvalido)
+                .when()
+                .post(BASE_PATH)
+                .then()
+                .statusCode(400)
+                .body("errors", not(empty()));
+    }
+
+    @Test
+    @Order(5)
+    void getById_cuandoNoExiste_debeRetornar404() {
+        given()
+                .when().get(BASE_PATH + "/9999")
+                .then()
+                .statusCode(404)
+                .body("message", containsString("9999"));
+    }
+
+    @Test
+    @Order(6)
+    void delete_cuandoNoExiste_debeRetornar404() {
+        given()
+                .when().delete(BASE_PATH + "/9999")
+                .then()
+                .statusCode(404);
+    }
+}

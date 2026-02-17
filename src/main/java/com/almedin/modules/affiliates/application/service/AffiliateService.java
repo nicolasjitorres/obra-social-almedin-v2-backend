@@ -6,6 +6,7 @@ import com.almedin.modules.affiliates.application.mapper.AffiliateMapper;
 import com.almedin.modules.affiliates.domain.exceptions.AffiliateNotFoundException;
 import com.almedin.modules.affiliates.domain.model.Affiliate;
 import com.almedin.modules.affiliates.domain.repository.AffiliateRepository;
+import com.almedin.modules.shared.domain.enums.Role;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -39,6 +40,7 @@ public class AffiliateService {
         }
 
         Affiliate affiliate = affiliateMapper.toEntity(request);
+        affiliate.setRole(Role.AFFILIATE);
         affiliateRepository.persist(affiliate);
         return affiliateMapper.toResponse(affiliate);
     }
@@ -47,7 +49,6 @@ public class AffiliateService {
     public AffiliateResponse update(Long id, AffiliateRequest request) {
         Affiliate existing = getOrThrow(id);
 
-        // Valida unicidad de DNI solo si cambió
         if (!existing.getDni().equals(request.dni()) &&
                 affiliateRepository.findAffiliateByDni(request.dni()).isPresent()) {
             throw new IllegalArgumentException("Ya existe un afiliado con el DNI: " + request.dni());
