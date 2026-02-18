@@ -40,7 +40,7 @@ public class EntityManagerSpecialistRepository implements SpecialistRepository {
     @Override
     public Optional<Specialist> findByEmail(String email) {
         return em.createQuery(
-                        "SELECT s FROM Specialist s WHERE s.email = :email AND s.active = true",
+                        "SELECT s FROM Specialist s WHERE s.email = :email",
                         Specialist.class)
                 .setParameter("email", email)
                 .getResultStream()

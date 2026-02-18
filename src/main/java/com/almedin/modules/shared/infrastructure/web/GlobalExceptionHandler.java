@@ -1,5 +1,6 @@
 package com.almedin.modules.shared.infrastructure.web;
 
+import com.almedin.modules.shared.domain.exceptions.BusinessRuleViolationException;
 import com.almedin.modules.shared.domain.exceptions.EntityNotFoundException;
 import io.quarkus.security.UnauthorizedException;
 import jakarta.validation.ConstraintViolation;
@@ -30,13 +31,13 @@ public class GlobalExceptionHandler implements ExceptionMapper<Exception> {
         }
 
         // Violación de regla de negocio específica
-        if (exception instanceof com.almedin.modules.shared.domain.exceptions.BusinessRuleViolationException e) {
+        if (exception instanceof BusinessRuleViolationException e) {
             return build(Response.Status.BAD_REQUEST, "Solicitud inválida", e.getMessage());
         }
 
         // Regla de negocio violada o dato duplicado
         if (exception instanceof IllegalArgumentException e) {
-            return build(Response.Status.CONFLICT, "Solicitud inválida", e.getMessage());
+            return build(Response.Status.BAD_REQUEST, "Solicitud inválida", e.getMessage());
         }
 
         // Estado invalido (cuenta desactivada, etc)

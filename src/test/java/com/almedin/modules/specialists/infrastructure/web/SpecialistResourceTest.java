@@ -62,14 +62,14 @@ class SpecialistResourceTest {
 
     @Test
     @Order(3)
-    void create_conDniDuplicado_debeRetornar409() {
+    void create_conDniDuplicado_debeRetornar400() {
         given()
                 .contentType(ContentType.JSON)
                 .body(VALID_BODY)
                 .when()
                 .post(BASE_PATH)
                 .then()
-                .statusCode(409)
+                .statusCode(400)
                 .body("message", containsString("DNI"));
     }
 
