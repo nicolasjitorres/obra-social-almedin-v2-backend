@@ -5,7 +5,9 @@ import com.almedin.modules.affiliates.domain.repository.AffiliateRepository;
 import com.almedin.modules.scheduling.application.dto.*;
 import com.almedin.modules.scheduling.domain.model.*;
 import com.almedin.modules.scheduling.domain.repository.*;
+import com.almedin.modules.shared.application.security.SecurityContext;
 import com.almedin.modules.shared.domain.enums.*;
+import com.almedin.modules.shared.domain.exceptions.BusinessRuleViolationException;
 import com.almedin.modules.specialists.domain.model.Specialist;
 import com.almedin.modules.specialists.domain.repository.SpecialistRepository;
 import io.quarkus.test.InjectMock;
@@ -26,6 +28,9 @@ import static org.mockito.Mockito.*;
 
 @QuarkusTest
 class AppointmentServiceTest {
+
+    @InjectMock
+    SecurityContext securityContext;
 
     @InjectMock
     AppointmentRepository appointmentRepository;
@@ -56,6 +61,7 @@ class AppointmentServiceTest {
 
     @BeforeEach
     void setUp() {
+        when(securityContext.isAdmin()).thenReturn(true);
 
         affiliate = new Affiliate();
         affiliate.setId(1L);
@@ -173,7 +179,7 @@ class AppointmentServiceTest {
                 .thenReturn(List.of(unavailability));
 
         assertThatThrownBy(() -> appointmentService.create(request))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(BusinessRuleViolationException.class)
                 .hasMessageContaining("no está disponible");
 
         verify(appointmentRepository, never()).persist(any());
@@ -192,7 +198,7 @@ class AppointmentServiceTest {
                 .thenReturn(List.of(appointment)); // slot 9:00 ya ocupado
 
         assertThatThrownBy(() -> appointmentService.create(request))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(BusinessRuleViolationException.class)
                 .hasMessageContaining("ya está ocupado");
 
         verify(appointmentRepository, never()).persist(any());

@@ -5,6 +5,7 @@ import com.almedin.modules.scheduling.application.mapper.SchedulingMapper;
 import com.almedin.modules.scheduling.domain.model.Schedule;
 import com.almedin.modules.scheduling.domain.repository.AppointmentRepository;
 import com.almedin.modules.scheduling.domain.repository.ScheduleRepository;
+import com.almedin.modules.shared.application.security.SecurityContext;
 import com.almedin.modules.shared.domain.enums.AppointmentStatus;
 import com.almedin.modules.shared.domain.enums.CancelledBy;
 import com.almedin.modules.shared.domain.enums.DayOfWeek;
@@ -34,12 +35,20 @@ public class ScheduleService {
     @Inject
     SchedulingMapper mapper;
 
+    @Inject
+    SecurityContext securityContext;
+
     public List<ScheduleResponse> findBySpecialist(Long specialistId) {
         return mapper.toScheduleResponseList(scheduleRepository.findBySpecialistId(specialistId));
     }
 
     @Transactional
     public ScheduleResponse create(ScheduleRequest request) {
+
+        if (!securityContext.isAdmin()) {
+            securityContext.requireSelfOrAdmin(request.specialistId());
+        }
+
         Specialist specialist = specialistRepository.findById(request.specialistId())
                 .orElseThrow(() -> new IllegalArgumentException("Especialista no encontrado con id: " + request.specialistId()));
 
@@ -62,6 +71,10 @@ public class ScheduleService {
     public ScheduleResponse update(Long id, ScheduleRequest request) {
         Schedule existing = scheduleRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Horario no encontrado con id: " + id));
+
+        if (!securityContext.isAdmin()) {
+            securityContext.requireSelfOrAdmin(existing.getSpecialist().getId()); // ← agregar
+        }
 
         if (request.endTime().isBefore(request.startTime())) {
             throw new IllegalArgumentException("La hora de fin debe ser posterior a la hora de inicio");
@@ -94,6 +107,9 @@ public class ScheduleService {
     public void deactivate(Long id) {
         Schedule schedule = scheduleRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Horario no encontrado con id: " + id));
+        if (!securityContext.isAdmin()) {
+            securityContext.requireSelfOrAdmin(schedule.getSpecialist().getId()); // ← agregar
+        }
         schedule.setActive(false);
     }
 

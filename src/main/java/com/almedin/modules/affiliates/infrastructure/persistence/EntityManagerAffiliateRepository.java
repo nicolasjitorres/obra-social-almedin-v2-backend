@@ -52,6 +52,16 @@ public class EntityManagerAffiliateRepository implements AffiliateRepository {
     }
 
     @Override
+    public Optional<Affiliate> findByEmail(String email) {
+        return em.createQuery(
+                        "SELECT a FROM Affiliate a WHERE a.email = :email AND a.active = true",
+                        Affiliate.class)
+                .setParameter("email", email)
+                .getResultStream()
+                .findFirst();
+    }
+
+    @Override
     public Optional<Affiliate> findByHealthInsuranceCode(String healthInsuranceCode) {
         return em.createQuery(
                         "SELECT a FROM Affiliate a WHERE a.healthInsuranceCode = :code AND a.active = true", Affiliate.class)

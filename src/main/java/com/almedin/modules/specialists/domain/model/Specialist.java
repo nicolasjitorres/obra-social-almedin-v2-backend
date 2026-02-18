@@ -27,12 +27,4 @@ public class Specialist extends User {
 
     @Column(name = "address")
     private String address;
-
-    @Column(name = "active", nullable = false, columnDefinition = "boolean default true")
-    @Builder.Default
-    private boolean active = true;
-
-    public void deactivate() {
-        this.active = false;
-    }
 }

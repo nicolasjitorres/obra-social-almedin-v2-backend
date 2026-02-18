@@ -76,9 +76,11 @@ public class Appointment {
     private String prescription;
 
     @Column(name = "penalty_applied")
+    @Builder.Default
     private Boolean penaltyApplied = false;
 
     @Column(name = "reminder_sent")
+    @Builder.Default
     private Boolean reminderSent = false;
 
     @Column(name = "created_at", nullable = false, updatable = false)

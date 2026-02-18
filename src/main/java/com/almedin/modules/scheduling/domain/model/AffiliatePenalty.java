@@ -37,6 +37,7 @@ public class AffiliatePenalty {
     private LocalDateTime suspendedUntil;
 
     @Column(nullable = false)
+    @Builder.Default
     private Boolean active = true;
 
     @PrePersist

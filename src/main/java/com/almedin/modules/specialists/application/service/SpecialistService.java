@@ -1,5 +1,7 @@
 package com.almedin.modules.specialists.application.service;
 
+import at.favre.lib.crypto.bcrypt.BCrypt;
+import com.almedin.modules.shared.application.security.SecurityContext;
 import com.almedin.modules.specialists.application.dto.SpecialistRequest;
 import com.almedin.modules.specialists.application.dto.SpecialistResponse;
 import com.almedin.modules.specialists.application.mapper.SpecialistMapper;
@@ -22,12 +24,17 @@ public class SpecialistService {
     @Inject
     SpecialistMapper specialistMapper;
 
+    @Inject
+    SecurityContext securityContext;
+
     public List<SpecialistResponse> findAll() {
         return specialistMapper.toResponseList(specialistRepository.listAll());
     }
 
     public SpecialistResponse findById(Long id) {
-        return specialistMapper.toResponse(getOrThrow(id));
+        Specialist specialist = getOrThrow(id);
+        securityContext.requireSelfOrAdmin(id);
+        return specialistMapper.toResponse(specialist);
     }
 
     @Transactional
@@ -38,6 +45,7 @@ public class SpecialistService {
 
         Specialist specialist = specialistMapper.toEntity(request);
         specialist.setRole(Role.SPECIALIST);
+        specialist.setPassword(BCrypt.withDefaults().hashToString(12, request.password().toCharArray()));
         specialistRepository.persist(specialist);
         return specialistMapper.toResponse(specialist);
     }

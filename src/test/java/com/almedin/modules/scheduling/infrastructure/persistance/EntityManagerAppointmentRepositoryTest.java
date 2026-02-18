@@ -50,6 +50,7 @@ class EntityManagerAppointmentRepositoryTest {
         affiliate.setEmail("test.afiliado@email.com");
         affiliate.setHealthInsuranceCode("OS-TEST");
         affiliate.setRole(Role.AFFILIATE);
+        affiliate.setPassword("hashed-password-para-tests");
         em.persist(affiliate);
 
         specialist = new Specialist();
@@ -60,6 +61,7 @@ class EntityManagerAppointmentRepositoryTest {
         specialist.setSpeciality(Speciality.CARDIOLOGIA);
         specialist.setAddress("Test 123");
         specialist.setRole(Role.SPECIALIST);
+        specialist.setPassword("hashed-password-para-tests");
         em.persist(specialist);
     }
 

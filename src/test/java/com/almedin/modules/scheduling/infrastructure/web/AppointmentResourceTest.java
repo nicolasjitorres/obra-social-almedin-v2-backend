@@ -1,6 +1,9 @@
 package com.almedin.modules.scheduling.infrastructure.web;
 
 import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.security.TestSecurity;
+import io.quarkus.test.security.jwt.Claim;
+import io.quarkus.test.security.jwt.JwtSecurity;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.*;
 
@@ -8,6 +11,10 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
 
 @QuarkusTest
+@TestSecurity(user = "admin@almedin.com", roles = "ADMIN")
+@JwtSecurity(claims = {
+        @Claim(key = "userId", value = "1")
+})
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class AppointmentResourceTest {
 
@@ -26,7 +33,8 @@ class AppointmentResourceTest {
                     "lastName": "Rodríguez",
                     "dni": "77889900",
                     "email": "carlos.turnos@email.com",
-                    "healthInsuranceCode": "OSDE-9999"
+                    "healthInsuranceCode": "OSDE-9999",
+                    "password": "password123"
                 }
                 """;
 
@@ -49,7 +57,8 @@ class AppointmentResourceTest {
                     "dni": "66778899",
                     "email": "marta.turnos@email.com",
                     "speciality": "CARDIOLOGIA",
-                    "address": "Av. Corrientes 500"
+                    "address": "Av. Corrientes 500",
+                    "password": "password123"
                 }
                 """;
 

@@ -5,6 +5,7 @@ import com.almedin.modules.affiliates.application.dto.AffiliateResponse;
 import com.almedin.modules.affiliates.domain.exceptions.AffiliateNotFoundException;
 import com.almedin.modules.affiliates.domain.model.Affiliate;
 import com.almedin.modules.affiliates.domain.repository.AffiliateRepository;
+import com.almedin.modules.shared.application.security.SecurityContext;
 import io.quarkus.test.InjectMock;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
@@ -21,16 +22,22 @@ import static org.mockito.Mockito.*;
 class AffiliateServiceTest {
 
     @InjectMock
+    SecurityContext securityContext;
+
+    @InjectMock
     AffiliateRepository affiliateRepository;
 
     @Inject
     AffiliateService affiliateService;
+
 
     private Affiliate affiliate;
     private AffiliateRequest request;
 
     @BeforeEach
     void setUp() {
+        when(securityContext.isAdmin()).thenReturn(true);
+
         affiliate = new Affiliate();
         affiliate.setId(1L);
         affiliate.setFirstName("Juan");
@@ -40,7 +47,7 @@ class AffiliateServiceTest {
         affiliate.setHealthInsuranceCode("OS-001");
 
         request = new AffiliateRequest(
-                "Juan", "Pérez", "12345678", "juan@email.com", "OS-001"
+                "Juan", "Pérez", "12345678", "juan@email.com", "OS-001", "password123"
         );
     }
 
@@ -110,7 +117,7 @@ class AffiliateServiceTest {
     @Test
     void update_cuandoDniCambiado_yYaExiste_debeLanzarConflicto() {
         AffiliateRequest requestConDniNuevo = new AffiliateRequest(
-                "Juan", "Pérez", "99999999", "juan@email.com", "OS-001"
+                "Juan", "Pérez", "99999999", "juan@email.com", "OS-001", "password123"
         );
         Affiliate otraPersona = new Affiliate();
         otraPersona.setDni("99999999");

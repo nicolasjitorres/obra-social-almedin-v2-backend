@@ -1,12 +1,15 @@
 package com.almedin.modules.affiliates.application.service;
 
+import at.favre.lib.crypto.bcrypt.BCrypt;
 import com.almedin.modules.affiliates.application.dto.AffiliateRequest;
 import com.almedin.modules.affiliates.application.dto.AffiliateResponse;
 import com.almedin.modules.affiliates.application.mapper.AffiliateMapper;
 import com.almedin.modules.affiliates.domain.exceptions.AffiliateNotFoundException;
 import com.almedin.modules.affiliates.domain.model.Affiliate;
 import com.almedin.modules.affiliates.domain.repository.AffiliateRepository;
+import com.almedin.modules.shared.application.security.SecurityContext;
 import com.almedin.modules.shared.domain.enums.Role;
+import com.almedin.modules.specialists.domain.model.Specialist;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -22,12 +25,17 @@ public class AffiliateService {
     @Inject
     AffiliateMapper affiliateMapper;
 
+    @Inject
+    SecurityContext securityContext;
+
     public List<AffiliateResponse> findAll() {
         return affiliateMapper.toResponseList(affiliateRepository.listAll());
     }
 
     public AffiliateResponse findById(Long id) {
-        return affiliateMapper.toResponse(getOrThrow(id));
+        Affiliate affiliate = getOrThrow(id);
+        securityContext.requireSelfOrAdmin(id);
+        return affiliateMapper.toResponse(affiliate);
     }
 
     @Transactional
@@ -41,6 +49,7 @@ public class AffiliateService {
 
         Affiliate affiliate = affiliateMapper.toEntity(request);
         affiliate.setRole(Role.AFFILIATE);
+        affiliate.setPassword(BCrypt.withDefaults().hashToString(12, request.password().toCharArray()));
         affiliateRepository.persist(affiliate);
         return affiliateMapper.toResponse(affiliate);
     }

@@ -24,5 +24,8 @@ public record SpecialistRequest(
         @NotNull(message = "La especialidad es obligatoria")
         Speciality speciality,
 
-        String address
+        String address,
+
+        @NotBlank(message = "La contraseña es obligatoria")
+        String password
 ) {}

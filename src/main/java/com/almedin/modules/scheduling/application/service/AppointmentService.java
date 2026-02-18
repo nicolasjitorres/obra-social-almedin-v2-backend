@@ -4,11 +4,15 @@ import com.almedin.modules.affiliates.domain.model.Affiliate;
 import com.almedin.modules.affiliates.domain.repository.AffiliateRepository;
 import com.almedin.modules.scheduling.application.dto.*;
 import com.almedin.modules.scheduling.application.mapper.SchedulingMapper;
+import com.almedin.modules.scheduling.domain.exceptions.AppointmentNotFoundException;
 import com.almedin.modules.scheduling.domain.model.*;
 import com.almedin.modules.scheduling.domain.repository.*;
+import com.almedin.modules.shared.application.security.SecurityContext;
 import com.almedin.modules.shared.domain.enums.AppointmentStatus;
+import com.almedin.modules.shared.domain.enums.AppointmentType;
 import com.almedin.modules.shared.domain.enums.CancelledBy;
 import com.almedin.modules.shared.domain.enums.DayOfWeek;
+import com.almedin.modules.shared.domain.exceptions.BusinessRuleViolationException;
 import com.almedin.modules.specialists.domain.model.Specialist;
 import com.almedin.modules.specialists.domain.repository.SpecialistRepository;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -48,17 +52,23 @@ public class AppointmentService {
     @Inject
     SchedulingMapper mapper;
 
+    @Inject
+    SecurityContext securityContext;
+
     public List<AppointmentResponse> findByAffiliate(Long affiliateId) {
+        securityContext.requireSelfOrAdmin(affiliateId);
         return mapper.toAppointmentResponseList(
                 appointmentRepository.findByAffiliateId(affiliateId));
     }
 
     public List<AppointmentResponse> findBySpecialist(Long specialistId) {
+        securityContext.requireSelfOrAdmin(specialistId);
         return mapper.toAppointmentResponseList(
                 appointmentRepository.findBySpecialistId(specialistId));
     }
 
     public List<AppointmentResponse> findBySpecialistAndDate(Long specialistId, LocalDate date) {
+        securityContext.requireSelfOrAdmin(specialistId);
         return mapper.toAppointmentResponseList(
                 appointmentRepository.findBySpecialistIdAndDate(specialistId, date));
     }
@@ -67,6 +77,7 @@ public class AppointmentService {
         return mapper.toAppointmentResponse(getOrThrow(id));
     }
 
+    // FUNDAMENTALES LOS COMENTARIOS AQUI PARA ENTENDER LA LOGICA DE NEGOCIO DE CADA VALIDACION, y ademas para entender el funcionamiento
     @Transactional
     public AppointmentResponse create(AppointmentRequest request) {
         Affiliate affiliate = affiliateRepository.findById(request.affiliateId())
@@ -81,6 +92,27 @@ public class AppointmentService {
                     throw new IllegalStateException(
                             "El afiliado tiene una suspensión activa hasta: " + p.getSuspendedUntil());
                 });
+
+        if (!securityContext.isAdmin()) {
+            String role = securityContext.getCurrentRole();
+
+            if (role.equals("AFFILIATE")) {
+                // El afiliado solo puede crear citas de tipo CONSULTA
+                if (request.type() != AppointmentType.CONSULTA) {
+                    throw new IllegalArgumentException("Los afiliados solo pueden solicitar turnos de tipo CONSULTA");
+                }
+                // Y solo para sí mismo
+                securityContext.requireSelfOrAdmin(request.affiliateId());
+
+            } else if (role.equals("SPECIALIST")) {
+                // El especialista solo puede crear citas derivadas (con parentAppointmentId)
+                if (request.parentAppointmentId() == null) {
+                    throw new IllegalArgumentException("Los especialistas solo pueden crear turnos derivados de una consulta existente");
+                }
+                // Y solo para sus propios pacientes
+                securityContext.requireSelfOrAdmin(request.specialistId());
+            }
+        }
 
         // Verificar que el especialista tiene horario ese día
         DayOfWeek dayOfWeek = DayOfWeek.from(request.date().getDayOfWeek());
@@ -104,7 +136,7 @@ public class AppointmentService {
         boolean isUnavailable = !unavailabilityRepository
                 .findBySpecialistIdAndDate(specialist.getId(), request.date()).isEmpty();
         if (isUnavailable) {
-            throw new IllegalArgumentException("El especialista no está disponible en esa fecha");
+            throw new BusinessRuleViolationException("El especialista no está disponible en esa fecha");
         }
 
         // Verificar que el turno no este ya ocupado
@@ -115,7 +147,7 @@ public class AppointmentService {
                 .anyMatch(a -> a.getStartTime().equals(request.startTime()));
 
         if (slotOccupied) {
-            throw new IllegalArgumentException("El horario seleccionado ya está ocupado");
+            throw new BusinessRuleViolationException("El horario seleccionado ya está ocupado");
         }
 
         LocalTime endTime = request.startTime().plusMinutes(matchingSchedule.getSlotDuration());
@@ -152,6 +184,15 @@ public class AppointmentService {
     public AppointmentResponse cancel(Long id, CancelAppointmentRequest request) {
         Appointment appointment = getOrThrow(id);
 
+        if (!securityContext.isAdmin()) {
+            Long currentUserId = securityContext.getCurrentUserId();
+            boolean isOwner = currentUserId.equals(appointment.getAffiliate().getId())
+                    || currentUserId.equals(appointment.getSpecialist().getId());
+            if (!isOwner) {
+                throw new io.quarkus.security.UnauthorizedException("No tenés permiso para cancelar esta cita");
+            }
+        }
+
         if (appointment.getStatus() == AppointmentStatus.CANCELADA) {
             throw new IllegalStateException("La cita ya está cancelada");
         }
@@ -185,6 +226,7 @@ public class AppointmentService {
     @Transactional
     public AppointmentResponse complete(Long id, CompleteAppointmentRequest request) {
         Appointment appointment = getOrThrow(id);
+        securityContext.requireSelfOrAdmin(appointment.getSpecialist().getId());
 
         if (appointment.getStatus() != AppointmentStatus.CONFIRMADA) {
             throw new IllegalStateException("Solo se pueden completar citas confirmadas");
@@ -200,6 +242,7 @@ public class AppointmentService {
     @Transactional
     public AppointmentResponse markAsAbsent(Long id) {
         Appointment appointment = getOrThrow(id);
+        securityContext.requireSelfOrAdmin(appointment.getSpecialist().getId());
 
         if (appointment.getStatus() != AppointmentStatus.CONFIRMADA) {
             throw new IllegalStateException("Solo se pueden marcar como ausente citas confirmadas");
@@ -230,20 +273,20 @@ public class AppointmentService {
         penaltyRepository.persist(penalty);
     }
 
-    private com.almedin.modules.shared.domain.enums.DayOfWeek mapDayOfWeek(LocalDate date) {
+    private DayOfWeek mapDayOfWeek(LocalDate date) {
         return switch (date.getDayOfWeek()) {
-            case MONDAY -> com.almedin.modules.shared.domain.enums.DayOfWeek.LUNES;
-            case TUESDAY -> com.almedin.modules.shared.domain.enums.DayOfWeek.MARTES;
-            case WEDNESDAY -> com.almedin.modules.shared.domain.enums.DayOfWeek.MIERCOLES;
-            case THURSDAY -> com.almedin.modules.shared.domain.enums.DayOfWeek.JUEVES;
-            case FRIDAY -> com.almedin.modules.shared.domain.enums.DayOfWeek.VIERNES;
-            case SATURDAY -> com.almedin.modules.shared.domain.enums.DayOfWeek.SABADO;
-            case SUNDAY -> com.almedin.modules.shared.domain.enums.DayOfWeek.DOMINGO;
+            case MONDAY -> DayOfWeek.LUNES;
+            case TUESDAY -> DayOfWeek.MARTES;
+            case WEDNESDAY -> DayOfWeek.MIERCOLES;
+            case THURSDAY -> DayOfWeek.JUEVES;
+            case FRIDAY -> DayOfWeek.VIERNES;
+            case SATURDAY -> DayOfWeek.SABADO;
+            case SUNDAY -> DayOfWeek.DOMINGO;
         };
     }
 
     private Appointment getOrThrow(Long id) {
         return appointmentRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Cita no encontrada con id: " + id));
+                .orElseThrow(() -> new AppointmentNotFoundException(id));
     }
 }

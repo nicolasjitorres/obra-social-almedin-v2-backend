@@ -44,5 +44,6 @@ public class Schedule {
     private Integer slotDuration;
 
     @Column(nullable = false)
+    @Builder.Default
     private Boolean active = true;
 }

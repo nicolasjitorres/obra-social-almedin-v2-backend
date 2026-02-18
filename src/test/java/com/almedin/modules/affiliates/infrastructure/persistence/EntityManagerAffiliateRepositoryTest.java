@@ -38,6 +38,7 @@ class EntityManagerAffiliateRepositoryTest {
         affiliate.setDni("87654321");
         affiliate.setEmail("maria@email.com");
         affiliate.setHealthInsuranceCode("OS-002");
+        affiliate.setPassword("hashed-password-para-tests");
         affiliate.setRole(Role.AFFILIATE);
     }
 

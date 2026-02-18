@@ -1,6 +1,9 @@
 package com.almedin.modules.specialists.infrastructure.web;
 
 import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.security.TestSecurity;
+import io.quarkus.test.security.jwt.Claim;
+import io.quarkus.test.security.jwt.JwtSecurity;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -11,6 +14,10 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
 
 @QuarkusTest
+@TestSecurity(user = "admin@almedin.com", roles = "ADMIN")
+@JwtSecurity(claims = {
+        @Claim(key = "userId", value = "1")
+})
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class SpecialistResourceTest {
 
@@ -23,7 +30,8 @@ class SpecialistResourceTest {
                 "dni": "44556677",
                 "email": "ana@email.com",
                 "speciality": "CARDIOLOGIA",
-                "address": "Belgrano 200"
+                "address": "Belgrano 200",
+                "password": "password123"
             }
             """;
 
@@ -75,7 +83,8 @@ class SpecialistResourceTest {
                     "dni": "55667788",
                     "email": "no-es-un-email",
                     "speciality": "ORTOPEDIA",
-                    "address": "Rivadavia 300"
+                    "address": "Rivadavia 300",
+                    "password": "password123"
                 }
                 """;
 

@@ -5,6 +5,7 @@ import com.almedin.modules.scheduling.application.dto.UnavailabilityResponse;
 import com.almedin.modules.scheduling.application.mapper.SchedulingMapper;
 import com.almedin.modules.scheduling.domain.model.SpecialistUnavailability;
 import com.almedin.modules.scheduling.domain.repository.UnavailabilityRepository;
+import com.almedin.modules.shared.application.security.SecurityContext;
 import com.almedin.modules.specialists.domain.model.Specialist;
 import com.almedin.modules.specialists.domain.repository.SpecialistRepository;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -25,13 +26,20 @@ public class UnavailabilityService {
     @Inject
     SchedulingMapper mapper;
 
+    @Inject
+    SecurityContext securityContext;
+
     public List<UnavailabilityResponse> findBySpecialist(Long specialistId) {
+        securityContext.requireSelfOrAdmin(specialistId);
         return mapper.toUnavailabilityResponseList(
                 unavailabilityRepository.findBySpecialistId(specialistId));
     }
 
     @Transactional
     public List<UnavailabilityResponse> create(UnavailabilityRequest request) {
+        if (!securityContext.isAdmin()) {
+            securityContext.requireSelfOrAdmin(request.specialistId()); // ← agregar
+        }
         Specialist specialist = specialistRepository.findById(request.specialistId())
                 .orElseThrow(() -> new IllegalArgumentException("Especialista no encontrado con id: " + request.specialistId()));
 
@@ -72,6 +80,9 @@ public class UnavailabilityService {
     public void delete(Long id) {
         SpecialistUnavailability u = unavailabilityRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Registro de no disponibilidad no encontrado con id: " + id));
+        if (!securityContext.isAdmin()) {
+            securityContext.requireSelfOrAdmin(u.getSpecialist().getId()); // ← agregar
+        }
         unavailabilityRepository.delete(u);
     }
 }

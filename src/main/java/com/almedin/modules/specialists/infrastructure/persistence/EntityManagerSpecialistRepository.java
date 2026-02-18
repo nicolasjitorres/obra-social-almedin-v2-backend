@@ -38,6 +38,16 @@ public class EntityManagerSpecialistRepository implements SpecialistRepository {
     }
 
     @Override
+    public Optional<Specialist> findByEmail(String email) {
+        return em.createQuery(
+                        "SELECT s FROM Specialist s WHERE s.email = :email AND s.active = true",
+                        Specialist.class)
+                .setParameter("email", email)
+                .getResultStream()
+                .findFirst();
+    }
+
+    @Override
     public void persist(Specialist specialist) {
         em.persist(specialist);
     }

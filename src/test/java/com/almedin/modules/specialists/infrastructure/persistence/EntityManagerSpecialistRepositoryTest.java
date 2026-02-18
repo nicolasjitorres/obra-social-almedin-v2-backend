@@ -42,6 +42,7 @@ class EntityManagerSpecialistRepositoryTest {
         specialist.setEmail("carlos@email.com");
         specialist.setSpeciality(Speciality.NEUROLOGIA);
         specialist.setAddress("Av. San Martín 500");
+        specialist.setPassword("hashed-password-para-tests");
         specialist.setRole(Role.SPECIALIST);
     }
 

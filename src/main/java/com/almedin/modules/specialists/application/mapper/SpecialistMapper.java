@@ -16,6 +16,7 @@ public interface SpecialistMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "role", ignore = true)
     @Mapping(target = "active", ignore = true)
+    @Mapping(target = "password", ignore = true)
     Specialist toEntity(SpecialistRequest request);
 
     SpecialistResponse toResponse(Specialist specialist);
@@ -25,5 +26,6 @@ public interface SpecialistMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "role", ignore = true)
     @Mapping(target = "active", ignore = true)
+    @Mapping(target = "password", ignore = true)
     void updateEntityFromRequest(SpecialistRequest request, @MappingTarget Specialist specialist);
 }

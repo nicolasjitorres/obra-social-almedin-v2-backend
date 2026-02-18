@@ -1,6 +1,9 @@
 package com.almedin.modules.affiliates.infrastructure.web;
 
 import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.security.TestSecurity;
+import io.quarkus.test.security.jwt.Claim;
+import io.quarkus.test.security.jwt.JwtSecurity;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -11,6 +14,10 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
 
 @QuarkusTest
+@TestSecurity(user = "admin@almedin.com", roles = "ADMIN")
+@JwtSecurity(claims = {
+        @Claim(key = "userId", value = "1")
+})
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class AffiliateResourceTest {
 
@@ -22,7 +29,8 @@ class AffiliateResourceTest {
                 "lastName": "López",
                 "dni": "11223344",
                 "email": "carlos@email.com",
-                "healthInsuranceCode": "OS-003"
+                "healthInsuranceCode": "OS-003",
+                "password": "password123"
             }
             """;
 
@@ -73,7 +81,8 @@ class AffiliateResourceTest {
                     "lastName": "Ruiz",
                     "dni": "55667788",
                     "email": "no-es-un-email",
-                    "healthInsuranceCode": "OS-004"
+                    "healthInsuranceCode": "OS-004",
+                    "password": "password123"
                 }
                 """;
 

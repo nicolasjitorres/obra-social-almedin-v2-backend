@@ -1,5 +1,6 @@
 package com.almedin.modules.specialists.application.service;
 
+import com.almedin.modules.shared.application.security.SecurityContext;
 import com.almedin.modules.specialists.application.dto.SpecialistRequest;
 import com.almedin.modules.specialists.application.dto.SpecialistResponse;
 import com.almedin.modules.specialists.domain.exceptions.SpecialistNotFoundException;
@@ -22,6 +23,9 @@ import static org.mockito.Mockito.*;
 class SpecialistServiceTest {
 
     @InjectMock
+    SecurityContext securityContext;
+
+    @InjectMock
     SpecialistRepository specialistRepository;
 
     @Inject
@@ -32,6 +36,8 @@ class SpecialistServiceTest {
 
     @BeforeEach
     void setUp() {
+        when(securityContext.isAdmin()).thenReturn(true);
+
         specialist = new Specialist();
         specialist.setId(1L);
         specialist.setFirstName("Laura");
@@ -43,7 +49,7 @@ class SpecialistServiceTest {
 
         request = new SpecialistRequest(
                 "Laura", "Gómez", "22334455", "laura@email.com",
-                Speciality.CARDIOLOGIA, "Av. Corrientes 1234"
+                Speciality.CARDIOLOGIA, "Av. Corrientes 1234", "password123"
         );
     }
 
@@ -102,7 +108,7 @@ class SpecialistServiceTest {
     void update_cuandoDniCambiado_yYaExiste_debeLanzarConflicto() {
         SpecialistRequest requestConDniNuevo = new SpecialistRequest(
                 "Laura", "Gómez", "99887766", "laura@email.com",
-                Speciality.NEUROLOGIA, "Av. Corrientes 1234"
+                Speciality.NEUROLOGIA, "Av. Corrientes 1234", "password123"
         );
         Specialist otraPersona = new Specialist();
         otraPersona.setDni("99887766");

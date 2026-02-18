@@ -16,6 +16,7 @@ public interface AffiliateMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "role", ignore = true)
     @Mapping(target = "active", ignore = true)
+    @Mapping(target = "password", ignore = true)
     Affiliate toEntity(AffiliateRequest request);
 
     AffiliateResponse toResponse(Affiliate affiliate);
@@ -25,5 +26,6 @@ public interface AffiliateMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "role", ignore = true)
     @Mapping(target = "active", ignore = true)
+    @Mapping(target = "password", ignore = true)
     void updateEntityFromRequest(AffiliateRequest request, @MappingTarget Affiliate affiliate);
 }

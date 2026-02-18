@@ -23,11 +23,4 @@ public class Affiliate extends User {
     @Column(name = "health_insurance_code", nullable = false)
     private String healthInsuranceCode;
 
-    @Column(name = "active", nullable = false, columnDefinition = "boolean default true")
-    @Builder.Default
-    private boolean active = true;
-
-    public void deactivate() {
-        this.active = false;
-    }
 }

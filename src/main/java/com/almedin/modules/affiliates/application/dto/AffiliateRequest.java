@@ -21,5 +21,8 @@ public record AffiliateRequest(
         String email,
 
         @NotBlank(message = "El código de obra social es obligatorio")
-        String healthInsuranceCode
+        String healthInsuranceCode,
+
+        @NotBlank(message = "La contraseña es obligatoria")
+        String password
 ) {}
