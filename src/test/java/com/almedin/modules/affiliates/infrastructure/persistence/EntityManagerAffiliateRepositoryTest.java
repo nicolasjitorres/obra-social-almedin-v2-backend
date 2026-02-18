@@ -4,6 +4,7 @@ import com.almedin.modules.affiliates.domain.model.Affiliate;
 import com.almedin.modules.shared.domain.enums.Role;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,13 +20,17 @@ class EntityManagerAffiliateRepositoryTest {
     @Inject
     EntityManagerAffiliateRepository repository;
 
+    @Inject
+    EntityManager em;
+
     private Affiliate affiliate;
 
     @BeforeEach
     @Transactional
     void setUp() {
-        // Limpiamos la tabla antes de cada test para evitar interferencias
-        repository.listAllAffiliates().forEach(repository::delete);
+        em.createQuery("DELETE FROM AffiliatePenalty").executeUpdate();
+        em.createQuery("DELETE FROM Appointment").executeUpdate();
+        em.createQuery("DELETE FROM Affiliate").executeUpdate();
 
         affiliate = new Affiliate();
         affiliate.setFirstName("María");
@@ -41,7 +46,7 @@ class EntityManagerAffiliateRepositoryTest {
     void persist_yListAll_debenFuncionar() {
         repository.persist(affiliate);
 
-        List<Affiliate> result = repository.listAllAffiliates();
+        List<Affiliate> result = repository.listAll();
 
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getDni()).isEqualTo("87654321");
@@ -52,7 +57,7 @@ class EntityManagerAffiliateRepositoryTest {
     void findByDni_cuandoExiste_debeRetornarAfiliado() {
         repository.persist(affiliate);
 
-        Optional<Affiliate> result = repository.findAffiliateByDni("87654321");
+        Optional<Affiliate> result = repository.findByDni("87654321");
 
         assertThat(result).isPresent();
         assertThat(result.get().getEmail()).isEqualTo("maria@email.com");
@@ -61,7 +66,7 @@ class EntityManagerAffiliateRepositoryTest {
     @Test
     @Transactional
     void findByDni_cuandoNoExiste_debeRetornarEmpty() {
-        Optional<Affiliate> result = repository.findAffiliateByDni("00000000");
+        Optional<Affiliate> result = repository.findByDni("00000000");
 
         assertThat(result).isEmpty();
     }
@@ -71,7 +76,7 @@ class EntityManagerAffiliateRepositoryTest {
     void findByHealthInsuranceCode_cuandoExiste_debeRetornarAfiliado() {
         repository.persist(affiliate);
 
-        Optional<Affiliate> result = repository.findAffiliateByHealthInsuranceCode("OS-002");
+        Optional<Affiliate> result = repository.findByHealthInsuranceCode("OS-002");
 
         assertThat(result).isPresent();
         assertThat(result.get().getDni()).isEqualTo("87654321");
@@ -79,12 +84,12 @@ class EntityManagerAffiliateRepositoryTest {
 
     @Test
     @Transactional
-    void delete_debeEliminarAfiliado() {
+    void deactivate_debeEliminarAfiliado() {
         repository.persist(affiliate);
-        Affiliate persisted = repository.findAffiliateByDni("87654321").get();
+        Affiliate persisted = repository.findByDni("87654321").get();
 
-        repository.delete(persisted);
+        repository.deactivate(persisted);
 
-        assertThat(repository.findAffiliateByDni("87654321")).isEmpty();
+        assertThat(repository.findByDni("87654321")).isEmpty();
     }
 }

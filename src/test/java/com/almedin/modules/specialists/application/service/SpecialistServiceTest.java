@@ -49,18 +49,18 @@ class SpecialistServiceTest {
 
     @Test
     void findAll_debeRetornarListaDeEspecialistas() {
-        when(specialistRepository.listAllSpecialists()).thenReturn(List.of(specialist));
+        when(specialistRepository.listAll()).thenReturn(List.of(specialist));
 
         List<SpecialistResponse> result = specialistService.findAll();
 
         assertThat(result).hasSize(1);
         assertThat(result.get(0).dni()).isEqualTo("22334455");
-        verify(specialistRepository, times(1)).listAllSpecialists();
+        verify(specialistRepository, times(1)).listAll();
     }
 
     @Test
     void findById_cuandoExiste_debeRetornarEspecialista() {
-        when(specialistRepository.findSpecialistById(1L)).thenReturn(Optional.of(specialist));
+        when(specialistRepository.findById(1L)).thenReturn(Optional.of(specialist));
 
         SpecialistResponse result = specialistService.findById(1L);
 
@@ -70,7 +70,7 @@ class SpecialistServiceTest {
 
     @Test
     void findById_cuandoNoExiste_debeLanzarNotFoundException() {
-        when(specialistRepository.findSpecialistById(99L)).thenReturn(Optional.empty());
+        when(specialistRepository.findById(99L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> specialistService.findById(99L))
                 .isInstanceOf(SpecialistNotFoundException.class);
@@ -78,7 +78,7 @@ class SpecialistServiceTest {
 
     @Test
     void create_cuandoDniDuplicado_debeLanzarIllegalArgumentException() {
-        when(specialistRepository.findSpecialistByDni("22334455"))
+        when(specialistRepository.findByDni("22334455"))
                 .thenReturn(Optional.of(specialist));
 
         assertThatThrownBy(() -> specialistService.create(request))
@@ -88,7 +88,7 @@ class SpecialistServiceTest {
 
     @Test
     void create_cuandoDatosValidos_debeRetornarEspecialistaCreado() {
-        when(specialistRepository.findSpecialistByDni("22334455")).thenReturn(Optional.empty());
+        when(specialistRepository.findByDni("22334455")).thenReturn(Optional.empty());
         doNothing().when(specialistRepository).persist(any(Specialist.class));
 
         SpecialistResponse result = specialistService.create(request);
@@ -107,8 +107,8 @@ class SpecialistServiceTest {
         Specialist otraPersona = new Specialist();
         otraPersona.setDni("99887766");
 
-        when(specialistRepository.findSpecialistById(1L)).thenReturn(Optional.of(specialist));
-        when(specialistRepository.findSpecialistByDni("99887766"))
+        when(specialistRepository.findById(1L)).thenReturn(Optional.of(specialist));
+        when(specialistRepository.findByDni("99887766"))
                 .thenReturn(Optional.of(otraPersona));
 
         assertThatThrownBy(() -> specialistService.update(1L, requestConDniNuevo))
@@ -117,12 +117,12 @@ class SpecialistServiceTest {
     }
 
     @Test
-    void delete_cuandoNoExiste_debeLanzarNotFoundException() {
-        when(specialistRepository.findSpecialistById(99L)).thenReturn(Optional.empty());
+    void deactivate_cuandoNoExiste_debeLanzarNotFoundException() {
+        when(specialistRepository.findById(99L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> specialistService.delete(99L))
+        assertThatThrownBy(() -> specialistService.deactivate(99L))
                 .isInstanceOf(SpecialistNotFoundException.class);
 
-        verify(specialistRepository, never()).delete(any());
+        verify(specialistRepository, never()).deactivate(any());
     }
 }

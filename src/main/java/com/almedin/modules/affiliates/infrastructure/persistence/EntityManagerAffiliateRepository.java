@@ -6,6 +6,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -16,14 +17,18 @@ public class EntityManagerAffiliateRepository implements AffiliateRepository {
     EntityManager em;
 
     @Override
-    public List<Affiliate> listAllAffiliates() {
-        return em.createQuery("SELECT a FROM Affiliate a", Affiliate.class)
+    public List<Affiliate> listAll() {
+        return em.createQuery("SELECT a FROM Affiliate a WHERE a.active = true", Affiliate.class)
                 .getResultList();
     }
 
     @Override
-    public Optional<Affiliate> findAffiliateById(Long id) {
-        return Optional.ofNullable(em.find(Affiliate.class, id));
+    public Optional<Affiliate> findById(Long id) {
+        return em.createQuery(
+                        "SELECT a FROM Affiliate a WHERE a.id = :id AND a.active = true", Affiliate.class
+                ).setParameter("id", id)
+                .getResultStream()
+                .findFirst();
     }
 
     @Override
@@ -32,26 +37,24 @@ public class EntityManagerAffiliateRepository implements AffiliateRepository {
     }
 
     @Override
-    public void delete(Affiliate affiliate) {
-        Affiliate managed = em.contains(affiliate)
-                ? affiliate
-                : em.merge(affiliate);
-        em.remove(managed);
+    public void deactivate(Affiliate affiliate) {
+        affiliate.deactivate();
+        em.merge(affiliate);
     }
 
     @Override
-    public Optional<Affiliate> findAffiliateByDni(String dni) {
+    public Optional<Affiliate> findByDni(String dni) {
         return em.createQuery(
-                        "SELECT a FROM Affiliate a WHERE a.dni = :dni", Affiliate.class)
+                        "SELECT a FROM Affiliate a WHERE a.dni = :dni AND a.active = true", Affiliate.class)
                 .setParameter("dni", dni)
                 .getResultStream()
                 .findFirst();
     }
 
     @Override
-    public Optional<Affiliate> findAffiliateByHealthInsuranceCode(String healthInsuranceCode) {
+    public Optional<Affiliate> findByHealthInsuranceCode(String healthInsuranceCode) {
         return em.createQuery(
-                        "SELECT a FROM Affiliate a WHERE a.healthInsuranceCode = :code", Affiliate.class)
+                        "SELECT a FROM Affiliate a WHERE a.healthInsuranceCode = :code AND a.active = true", Affiliate.class)
                 .setParameter("code", healthInsuranceCode)
                 .getResultStream()
                 .findFirst();

@@ -16,18 +16,22 @@ public class EntityManagerSpecialistRepository implements SpecialistRepository {
     EntityManager em;
 
     @Override
-    public List<Specialist> listAllSpecialists() {
-        return em.createQuery("SELECT s FROM Specialist s", Specialist.class).getResultList();
+    public List<Specialist> listAll() {
+        return em.createQuery("SELECT s FROM Specialist s WHERE s.active = true", Specialist.class).getResultList();
     }
 
     @Override
-    public Optional<Specialist> findSpecialistById(Long id) {
-        return Optional.ofNullable(em.find(Specialist.class, id));
+    public Optional<Specialist> findById(Long id) {
+        return em.createQuery(
+                        "SELECT s FROM Specialist s WHERE s.id = :id AND s.active = true", Specialist.class
+                ).setParameter("id", id)
+                .getResultStream()
+                .findFirst();
     }
 
     @Override
-    public Optional<Specialist> findSpecialistByDni(String dni) {
-        return em.createQuery("SELECT s FROM Specialist s WHERE s.dni = :dni", Specialist.class)
+    public Optional<Specialist> findByDni(String dni) {
+        return em.createQuery("SELECT s FROM Specialist s WHERE s.dni = :dni AND s.active = true", Specialist.class)
                 .setParameter("dni", dni)
                 .getResultStream()
                 .findFirst();
@@ -39,7 +43,8 @@ public class EntityManagerSpecialistRepository implements SpecialistRepository {
     }
 
     @Override
-    public void delete(Specialist specialist) {
-        em.remove(em.contains(specialist) ? specialist : em.merge(specialist));
+    public void deactivate(Specialist specialist) {
+        specialist.deactivate();
+        em.merge(specialist);
     }
 }

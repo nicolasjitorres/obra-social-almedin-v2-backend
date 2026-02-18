@@ -5,6 +5,7 @@ import com.almedin.modules.shared.domain.enums.Role;
 import com.almedin.modules.shared.domain.enums.Speciality;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,12 +21,19 @@ class EntityManagerSpecialistRepositoryTest {
     @Inject
     EntityManagerSpecialistRepository repository;
 
+    @Inject
+    EntityManager em;
+
     private Specialist specialist;
 
     @BeforeEach
     @Transactional
     void setUp() {
-        repository.listAllSpecialists().forEach(repository::delete);
+        em.createQuery("DELETE FROM AffiliatePenalty").executeUpdate();
+        em.createQuery("DELETE FROM SpecialistUnavailability").executeUpdate();
+        em.createQuery("DELETE FROM Schedule").executeUpdate();
+        em.createQuery("DELETE FROM Appointment").executeUpdate();
+        em.createQuery("DELETE FROM Specialist").executeUpdate();
 
         specialist = new Specialist();
         specialist.setFirstName("Carlos");
@@ -42,7 +50,7 @@ class EntityManagerSpecialistRepositoryTest {
     void persist_yListAll_debenFuncionar() {
         repository.persist(specialist);
 
-        List<Specialist> result = repository.listAllSpecialists();
+        List<Specialist> result = repository.listAll();
 
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getDni()).isEqualTo("33445566");
@@ -53,7 +61,7 @@ class EntityManagerSpecialistRepositoryTest {
     void findByDni_cuandoExiste_debeRetornarEspecialista() {
         repository.persist(specialist);
 
-        Optional<Specialist> result = repository.findSpecialistByDni("33445566");
+        Optional<Specialist> result = repository.findByDni("33445566");
 
         assertThat(result).isPresent();
         assertThat(result.get().getEmail()).isEqualTo("carlos@email.com");
@@ -62,7 +70,7 @@ class EntityManagerSpecialistRepositoryTest {
     @Test
     @Transactional
     void findByDni_cuandoNoExiste_debeRetornarEmpty() {
-        Optional<Specialist> result = repository.findSpecialistByDni("00000000");
+        Optional<Specialist> result = repository.findByDni("00000000");
 
         assertThat(result).isEmpty();
     }
@@ -71,9 +79,9 @@ class EntityManagerSpecialistRepositoryTest {
     @Transactional
     void findById_cuandoExiste_debeRetornarEspecialista() {
         repository.persist(specialist);
-        Specialist persisted = repository.findSpecialistByDni("33445566").get();
+        Specialist persisted = repository.findByDni("33445566").get();
 
-        Optional<Specialist> result = repository.findSpecialistById(persisted.getId());
+        Optional<Specialist> result = repository.findById(persisted.getId());
 
         assertThat(result).isPresent();
         assertThat(result.get().getSpeciality()).isEqualTo(Speciality.NEUROLOGIA);
@@ -81,12 +89,12 @@ class EntityManagerSpecialistRepositoryTest {
 
     @Test
     @Transactional
-    void delete_debeEliminarEspecialista() {
+    void deactivate_debeDesactivarEspecialista() {
         repository.persist(specialist);
-        Specialist persisted = repository.findSpecialistByDni("33445566").get();
+        Specialist persisted = repository.findByDni("33445566").get();
 
-        repository.delete(persisted);
+        repository.deactivate(persisted);
 
-        assertThat(repository.findSpecialistByDni("33445566")).isEmpty();
+        assertThat(repository.findByDni("33445566")).isEmpty();
     }
 }

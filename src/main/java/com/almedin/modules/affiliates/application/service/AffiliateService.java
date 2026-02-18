@@ -23,7 +23,7 @@ public class AffiliateService {
     AffiliateMapper affiliateMapper;
 
     public List<AffiliateResponse> findAll() {
-        return affiliateMapper.toResponseList(affiliateRepository.listAllAffiliates());
+        return affiliateMapper.toResponseList(affiliateRepository.listAll());
     }
 
     public AffiliateResponse findById(Long id) {
@@ -32,10 +32,10 @@ public class AffiliateService {
 
     @Transactional
     public AffiliateResponse create(AffiliateRequest request) {
-        if (affiliateRepository.findAffiliateByDni(request.dni()).isPresent()) {
+        if (affiliateRepository.findByDni(request.dni()).isPresent()) {
             throw new IllegalArgumentException("Ya existe un afiliado con el DNI: " + request.dni());
         }
-        if (affiliateRepository.findAffiliateByHealthInsuranceCode(request.healthInsuranceCode()).isPresent()) {
+        if (affiliateRepository.findByHealthInsuranceCode(request.healthInsuranceCode()).isPresent()) {
             throw new IllegalArgumentException("El código de obra social ya está registrado");
         }
 
@@ -50,7 +50,7 @@ public class AffiliateService {
         Affiliate existing = getOrThrow(id);
 
         if (!existing.getDni().equals(request.dni()) &&
-                affiliateRepository.findAffiliateByDni(request.dni()).isPresent()) {
+                affiliateRepository.findByDni(request.dni()).isPresent()) {
             throw new IllegalArgumentException("Ya existe un afiliado con el DNI: " + request.dni());
         }
 
@@ -59,12 +59,12 @@ public class AffiliateService {
     }
 
     @Transactional
-    public void delete(Long id) {
-        affiliateRepository.delete(getOrThrow(id));
+    public void deactivate(Long id) {
+        affiliateRepository.deactivate(getOrThrow(id));
     }
 
     private Affiliate getOrThrow(Long id) {
-        return affiliateRepository.findAffiliateById(id)
+        return affiliateRepository.findById(id)
                 .orElseThrow(() -> new AffiliateNotFoundException(id));
     }
 }

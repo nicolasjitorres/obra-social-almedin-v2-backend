@@ -10,5 +10,6 @@ public record SpecialistResponse(
         String email,
         Speciality speciality,
         String address,
-        String role
+        String role,
+        Boolean active
 ) {}

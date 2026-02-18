@@ -6,10 +6,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface SpecialistRepository {
-
-    List<Specialist> listAllSpecialists();
-    Optional<Specialist> findSpecialistById(Long id);
-    Optional<Specialist> findSpecialistByDni(String dni);
+    List<Specialist> listAll();
+    Optional<Specialist> findById(Long id);
+    Optional<Specialist> findByDni(String dni);
     void persist(Specialist specialist);
-    void delete(Specialist specialist);
+    void deactivate(Specialist specialist);
 }

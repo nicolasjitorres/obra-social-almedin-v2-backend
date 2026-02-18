@@ -71,10 +71,10 @@ public class SpecialistResource {
 
     @DELETE
     @Path("/{id}")
-    @Operation(summary = "Eliminar un especialista")
-    public Response delete(@PathParam("id") Long id) {
+    @Operation(summary = "Dar de baja un especialista")
+    public Response deactivate(@PathParam("id") Long id) {
         try {
-            specialistService.delete(id);
+            specialistService.deactivate(id);
             return Response.noContent().build();
         } catch (SpecialistNotFoundException e) {
             return Response.status(Response.Status.NOT_FOUND)
@@ -82,5 +82,6 @@ public class SpecialistResource {
         }
     }
 
-    record ErrorResponse(String message) {}
+    record ErrorResponse(String message) {
+    }
 }

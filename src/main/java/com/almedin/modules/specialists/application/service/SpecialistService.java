@@ -23,7 +23,7 @@ public class SpecialistService {
     SpecialistMapper specialistMapper;
 
     public List<SpecialistResponse> findAll() {
-        return specialistMapper.toResponseList(specialistRepository.listAllSpecialists());
+        return specialistMapper.toResponseList(specialistRepository.listAll());
     }
 
     public SpecialistResponse findById(Long id) {
@@ -32,7 +32,7 @@ public class SpecialistService {
 
     @Transactional
     public SpecialistResponse create(SpecialistRequest request) {
-        if (specialistRepository.findSpecialistByDni(request.dni()).isPresent()) {
+        if (specialistRepository.findByDni(request.dni()).isPresent()) {
             throw new IllegalArgumentException("Ya existe un especialista con el DNI: " + request.dni());
         }
 
@@ -47,7 +47,7 @@ public class SpecialistService {
         Specialist existing = getOrThrow(id);
 
         if (!existing.getDni().equals(request.dni()) &&
-                specialistRepository.findSpecialistByDni(request.dni()).isPresent()) {
+                specialistRepository.findByDni(request.dni()).isPresent()) {
             throw new IllegalArgumentException("Ya existe un especialista con el DNI: " + request.dni());
         }
 
@@ -56,12 +56,12 @@ public class SpecialistService {
     }
 
     @Transactional
-    public void delete(Long id) {
-        specialistRepository.delete(getOrThrow(id));
+    public void deactivate(Long id) {
+        specialistRepository.deactivate(getOrThrow(id));
     }
 
     private Specialist getOrThrow(Long id) {
-        return specialistRepository.findSpecialistById(id)
+        return specialistRepository.findById(id)
                 .orElseThrow(() -> new SpecialistNotFoundException(id));
     }
 }

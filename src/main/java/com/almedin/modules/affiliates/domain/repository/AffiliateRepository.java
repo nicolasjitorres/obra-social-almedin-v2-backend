@@ -9,10 +9,10 @@ import java.util.Optional;
 @ApplicationScoped
 public interface AffiliateRepository {
 
-    List<Affiliate> listAllAffiliates();
-    Optional<Affiliate> findAffiliateById(Long id);
+    List<Affiliate> listAll();
+    Optional<Affiliate> findById(Long id);
+    Optional<Affiliate> findByDni(String dni);
+    Optional<Affiliate> findByHealthInsuranceCode(String healthInsuranceCode);
     void persist(Affiliate affiliate);
-    void delete(Affiliate affiliate);
-    Optional<Affiliate> findAffiliateByDni(String dni);
-    Optional<Affiliate> findAffiliateByHealthInsuranceCode(String healthInsuranceCode);
+    void deactivate(Affiliate affiliate);
 }

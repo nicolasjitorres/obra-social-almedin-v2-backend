@@ -7,5 +7,6 @@ public record AffiliateResponse(
         String dni,
         String email,
         String healthInsuranceCode,
-        String role
+        String role,
+        Boolean active
 ) {}

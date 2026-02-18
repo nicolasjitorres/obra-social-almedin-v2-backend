@@ -51,9 +51,9 @@ public class AffiliateResource {
 
     @DELETE
     @Path("/{id}")
-    @Operation(summary = "Eliminar un afiliado")
-    public Response delete(@PathParam("id") Long id) {
-        affiliateService.delete(id);
+    @Operation(summary = "Dar de baja un afiliado")
+    public Response deactivate(@PathParam("id") Long id) {
+        affiliateService.deactivate(id);
         return Response.noContent().build();
     }
 }

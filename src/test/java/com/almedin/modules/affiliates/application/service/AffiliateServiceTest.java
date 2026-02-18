@@ -46,18 +46,18 @@ class AffiliateServiceTest {
 
     @Test
     void findAll_debeRetornarListaDeAfiliados() {
-        when(affiliateRepository.listAllAffiliates()).thenReturn(List.of(affiliate));
+        when(affiliateRepository.listAll()).thenReturn(List.of(affiliate));
 
         List<AffiliateResponse> result = affiliateService.findAll();
 
         assertThat(result).hasSize(1);
         assertThat(result.get(0).dni()).isEqualTo("12345678");
-        verify(affiliateRepository, times(1)).listAllAffiliates();
+        verify(affiliateRepository, times(1)).listAll();
     }
 
     @Test
     void findById_cuandoExiste_debeRetornarAfiliado() {
-        when(affiliateRepository.findAffiliateById(1L)).thenReturn(Optional.of(affiliate));
+        when(affiliateRepository.findById(1L)).thenReturn(Optional.of(affiliate));
 
         AffiliateResponse result = affiliateService.findById(1L);
 
@@ -67,7 +67,7 @@ class AffiliateServiceTest {
 
     @Test
     void findById_cuandoNoExiste_debeLanzarNotFoundException() {
-        when(affiliateRepository.findAffiliateById(99L)).thenReturn(Optional.empty());
+        when(affiliateRepository.findById(99L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> affiliateService.findById(99L))
                 .isInstanceOf(AffiliateNotFoundException.class);
@@ -75,7 +75,7 @@ class AffiliateServiceTest {
 
     @Test
     void create_cuandoDniDuplicado_debeLanzarIllegalArgumentException() {
-        when(affiliateRepository.findAffiliateByDni("12345678"))
+        when(affiliateRepository.findByDni("12345678"))
                 .thenReturn(Optional.of(affiliate));
 
         assertThatThrownBy(() -> affiliateService.create(request))
@@ -85,8 +85,8 @@ class AffiliateServiceTest {
 
     @Test
     void create_cuandoCodigoObraSocialDuplicado_debeLanzarIllegalArgumentException() {
-        when(affiliateRepository.findAffiliateByDni("12345678")).thenReturn(Optional.empty());
-        when(affiliateRepository.findAffiliateByHealthInsuranceCode("OS-001"))
+        when(affiliateRepository.findByDni("12345678")).thenReturn(Optional.empty());
+        when(affiliateRepository.findByHealthInsuranceCode("OS-001"))
                 .thenReturn(Optional.of(affiliate));
 
         assertThatThrownBy(() -> affiliateService.create(request))
@@ -96,8 +96,8 @@ class AffiliateServiceTest {
 
     @Test
     void create_cuandoDatosValidos_debeRetornarAfiliadoCreado() {
-        when(affiliateRepository.findAffiliateByDni("12345678")).thenReturn(Optional.empty());
-        when(affiliateRepository.findAffiliateByHealthInsuranceCode("OS-001")).thenReturn(Optional.empty());
+        when(affiliateRepository.findByDni("12345678")).thenReturn(Optional.empty());
+        when(affiliateRepository.findByHealthInsuranceCode("OS-001")).thenReturn(Optional.empty());
         doNothing().when(affiliateRepository).persist(any(Affiliate.class));
 
         AffiliateResponse result = affiliateService.create(request);
@@ -115,8 +115,8 @@ class AffiliateServiceTest {
         Affiliate otraPersona = new Affiliate();
         otraPersona.setDni("99999999");
 
-        when(affiliateRepository.findAffiliateById(1L)).thenReturn(Optional.of(affiliate));
-        when(affiliateRepository.findAffiliateByDni("99999999"))
+        when(affiliateRepository.findById(1L)).thenReturn(Optional.of(affiliate));
+        when(affiliateRepository.findByDni("99999999"))
                 .thenReturn(Optional.of(otraPersona));
 
         assertThatThrownBy(() -> affiliateService.update(1L, requestConDniNuevo))
@@ -125,12 +125,12 @@ class AffiliateServiceTest {
     }
 
     @Test
-    void delete_cuandoNoExiste_debeLanzarNotFoundException() {
-        when(affiliateRepository.findAffiliateById(99L)).thenReturn(Optional.empty());
+    void deactivate_cuandoNoExiste_debeLanzarNotFoundException() {
+        when(affiliateRepository.findById(99L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> affiliateService.delete(99L))
+        assertThatThrownBy(() -> affiliateService.deactivate(99L))
                 .isInstanceOf(AffiliateNotFoundException.class);
 
-        verify(affiliateRepository, never()).delete(any());
+        verify(affiliateRepository, never()).deactivate(any());
     }
 }
