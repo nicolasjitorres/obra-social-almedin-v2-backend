@@ -2,6 +2,9 @@ package com.almedin.modules.scheduling.infrastructure.web;
 
 import com.almedin.modules.scheduling.application.dto.*;
 import com.almedin.modules.scheduling.application.service.AppointmentService;
+import com.almedin.modules.shared.application.dto.PageRequest;
+import com.almedin.modules.shared.application.dto.PageResponse;
+import com.almedin.modules.shared.domain.enums.AppointmentStatus;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
@@ -27,6 +30,16 @@ public class AppointmentResource {
     AppointmentService appointmentService;
 
     @GET
+    @RolesAllowed("ADMIN")
+    @Operation(summary = "Listar todas las citas con paginación")
+    public PageResponse<AppointmentResponse> findAll(
+            @QueryParam("page") @DefaultValue("0") int page,
+            @QueryParam("size") @DefaultValue("10") int size,
+            @QueryParam("status") AppointmentStatus status) {
+        return appointmentService.findAll(new PageRequest(page, size), status);
+    }
+
+    @GET
     @Path("/{id}")
     @RolesAllowed("ADMIN")
     @Operation(summary = "Obtener cita por ID")
@@ -38,16 +51,22 @@ public class AppointmentResource {
     @Path("/affiliate/{affiliateId}")
     @RolesAllowed({"ADMIN", "AFFILIATE"})
     @Operation(summary = "Obtener citas de un afiliado")
-    public Response getByAffiliate(@PathParam("affiliateId") Long affiliateId) {
-        return Response.ok(appointmentService.findByAffiliate(affiliateId)).build();
+    public PageResponse<AppointmentResponse> getByAffiliate(
+            @PathParam("affiliateId") Long affiliateId,
+            @QueryParam("page") @DefaultValue("0") int page,
+            @QueryParam("size") @DefaultValue("10") int size) {
+        return appointmentService.findByAffiliate(affiliateId, new PageRequest(page, size));
     }
 
     @GET
     @Path("/specialist/{specialistId}")
     @RolesAllowed({"ADMIN", "SPECIALIST"})
     @Operation(summary = "Obtener citas de un especialista")
-    public Response getBySpecialist(@PathParam("specialistId") Long specialistId) {
-        return Response.ok(appointmentService.findBySpecialist(specialistId)).build();
+    public PageResponse<AppointmentResponse> getBySpecialist(
+            @PathParam("specialistId") Long specialistId,
+            @QueryParam("page") @DefaultValue("0") int page,
+            @QueryParam("size") @DefaultValue("10") int size) {
+        return appointmentService.findBySpecialist(specialistId, new PageRequest(page, size));
     }
 
     @GET

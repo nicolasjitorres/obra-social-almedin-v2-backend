@@ -6,10 +6,11 @@ import java.util.List;
 import java.util.Optional;
 
 public interface SpecialistRepository {
-    List<Specialist> listAll();
     Optional<Specialist> findById(Long id);
     Optional<Specialist> findByDni(String dni);
     Optional<Specialist> findByEmail(String email);
     void persist(Specialist specialist);
     void deactivate(Specialist specialist);
+    List<Specialist> listAll(int page, int size, String speciality);
+    long countAll(String speciality);
 }

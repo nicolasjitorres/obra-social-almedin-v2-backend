@@ -3,6 +3,8 @@ package com.almedin.modules.affiliates.infrastructure.web;
 import com.almedin.modules.affiliates.application.dto.AffiliateRequest;
 import com.almedin.modules.affiliates.application.dto.AffiliateResponse;
 import com.almedin.modules.affiliates.application.service.AffiliateService;
+import com.almedin.modules.shared.application.dto.PageRequest;
+import com.almedin.modules.shared.application.dto.PageResponse;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
@@ -29,9 +31,10 @@ public class AffiliateResource {
 
     @GET
     @RolesAllowed("ADMIN")
-    @Operation(summary = "Obtener todos los afiliados")
-    public List<AffiliateResponse> getAll() {
-        return affiliateService.findAll();
+    public PageResponse<AffiliateResponse> findAll(
+            @QueryParam("page") @DefaultValue("0") int page,
+            @QueryParam("size") @DefaultValue("10") int size) {
+        return affiliateService.findAll(new PageRequest(page, size));
     }
 
     @GET

@@ -85,7 +85,7 @@ class EntityManagerAppointmentRepositoryTest {
     void persist_yListAll_debenFuncionar() {
         repository.persist(buildAppointment(LocalTime.of(9, 0)));
 
-        List<Appointment> result = repository.listAll();
+        List<Appointment> result = repository.listAll(0,10, null);
 
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getAffiliate().getDni()).isEqualTo("10203040");
@@ -117,10 +117,22 @@ class EntityManagerAppointmentRepositoryTest {
         repository.persist(buildAppointment(LocalTime.of(9, 0)));
         repository.persist(buildAppointment(LocalTime.of(9, 30)));
 
-        List<Appointment> result = repository.findByAffiliateId(affiliate.getId());
+        List<Appointment> result = repository.findByAffiliateId(affiliate.getId(), 0, 10);
 
         assertThat(result).hasSize(2);
         assertThat(result).allMatch(a -> a.getAffiliate().getId().equals(affiliate.getId()));
+    }
+
+    @Test
+    @Transactional
+    void findBySpecialistId_debeRetornarCitasDelEspecialista() {
+        repository.persist(buildAppointment(LocalTime.of(9, 0)));
+        repository.persist(buildAppointment(LocalTime.of(9, 30)));
+
+        List<Appointment> result = repository.findBySpecialistId(specialist.getId(), 0, 10);
+
+        assertThat(result).hasSize(2);
+        assertThat(result).allMatch(a -> a.getSpecialist().getId().equals(specialist.getId()));
     }
 
     @Test

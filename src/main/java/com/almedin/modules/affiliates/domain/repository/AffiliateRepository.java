@@ -9,11 +9,12 @@ import java.util.Optional;
 @ApplicationScoped
 public interface AffiliateRepository {
 
-    List<Affiliate> listAll();
     Optional<Affiliate> findById(Long id);
     Optional<Affiliate> findByDni(String dni);
     Optional<Affiliate> findByEmail(String email);
     Optional<Affiliate> findByHealthInsuranceCode(String healthInsuranceCode);
     void persist(Affiliate affiliate);
     void deactivate(Affiliate affiliate);
+    List<Affiliate> listAll(int page, int size);
+    long countAll();
 }

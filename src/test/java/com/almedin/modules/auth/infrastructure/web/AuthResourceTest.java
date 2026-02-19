@@ -66,6 +66,7 @@ class AuthResourceTest {
     void login_afiliadoValido_debeRetornar200ConToken() {
         given()
                 .contentType("application/json")
+                .header("X-Forwarded-For", "1.1.1.1")
                 .body("""
                 {
                     "email": "juan@email.com",
@@ -87,6 +88,7 @@ class AuthResourceTest {
     void login_especialistaValido_debeRetornar200ConToken() {
         given()
                 .contentType("application/json")
+                .header("X-Forwarded-For", "1.1.1.2")
                 .body("""
                 {
                     "email": "laura@email.com",
@@ -106,6 +108,7 @@ class AuthResourceTest {
     void login_adminPorDefecto_debeRetornar200ConTokenAdmin() {
         given()
                 .contentType("application/json")
+                .header("X-Forwarded-For", "1.1.1.3")
                 .body("""
                 {
                     "email": "admin@almedin.com",
@@ -124,6 +127,7 @@ class AuthResourceTest {
     void login_passwordIncorrecto_debeRetornar400() {
         given()
                 .contentType("application/json")
+                .header("X-Forwarded-For", "1.1.1.4")
                 .body("""
                 {
                     "email": "juan@email.com",
@@ -141,6 +145,7 @@ class AuthResourceTest {
     void login_emailInexistente_debeRetornar400() {
         given()
                 .contentType("application/json")
+                .header("X-Forwarded-For", "1.1.1.1")
                 .body("""
                 {
                     "email": "noexiste@email.com",
@@ -158,6 +163,7 @@ class AuthResourceTest {
     void login_emailInvalido_debeRetornar400PorValidacion() {
         given()
                 .contentType("application/json")
+                .header("X-Forwarded-For", "1.1.1.2")
                 .body("""
                 {
                     "email": "no-es-un-email",
@@ -184,6 +190,7 @@ class AuthResourceTest {
         // Intentar login
         given()
                 .contentType("application/json")
+                .header("X-Forwarded-For", "1.1.1.3")
                 .body("""
                 {
                     "email": "juan@email.com",

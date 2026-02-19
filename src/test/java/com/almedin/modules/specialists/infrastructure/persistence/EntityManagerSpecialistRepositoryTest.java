@@ -51,7 +51,7 @@ class EntityManagerSpecialistRepositoryTest {
     void persist_yListAll_debenFuncionar() {
         repository.persist(specialist);
 
-        List<Specialist> result = repository.listAll();
+        List<Specialist> result = repository.listAll(0,10,null);
 
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getDni()).isEqualTo("33445566");

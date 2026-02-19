@@ -18,30 +18,10 @@ public class EntityManagerAppointmentRepository implements AppointmentRepository
     EntityManager em;
 
     @Override
-    public List<Appointment> listAll() {
-        return em.createQuery("SELECT a FROM Appointment a", Appointment.class).getResultList();
-    }
-
-    @Override
     public Optional<Appointment> findById(Long id) {
         return Optional.ofNullable(em.find(Appointment.class, id));
     }
 
-    @Override
-    public List<Appointment> findByAffiliateId(Long affiliateId) {
-        return em.createQuery(
-                        "SELECT a FROM Appointment a WHERE a.affiliate.id = :id", Appointment.class)
-                .setParameter("id", affiliateId)
-                .getResultList();
-    }
-
-    @Override
-    public List<Appointment> findBySpecialistId(Long specialistId) {
-        return em.createQuery(
-                        "SELECT a FROM Appointment a WHERE a.specialist.id = :id", Appointment.class)
-                .setParameter("id", specialistId)
-                .getResultList();
-    }
 
     @Override
     public List<Appointment> findBySpecialistIdAndDate(Long specialistId, LocalDate date) {
@@ -95,5 +75,70 @@ public class EntityManagerAppointmentRepository implements AppointmentRepository
                 .setParameter("date", date)
                 .setParameter("status", AppointmentStatus.CONFIRMADA)
                 .getResultList();
+    }
+
+    @Override
+    public List<Appointment> listAll(int page, int size, AppointmentStatus status) {
+        String jpql = status != null
+                ? "SELECT a FROM Appointment a WHERE a.status = :status"
+                : "SELECT a FROM Appointment a";
+
+        var query = em.createQuery(jpql, Appointment.class);
+        if (status != null) query.setParameter("status", status);
+
+        return query
+                .setFirstResult(page * size)
+                .setMaxResults(size)
+                .getResultList();
+    }
+
+    @Override
+    public long countAll(AppointmentStatus status) {
+        String jpql = status != null
+                ? "SELECT COUNT(a) FROM Appointment a WHERE a.status = :status"
+                : "SELECT COUNT(a) FROM Appointment a";
+
+        var query = em.createQuery(jpql, Long.class);
+        if (status != null) query.setParameter("status", status);
+
+        return query.getSingleResult();
+    }
+
+    @Override
+    public List<Appointment> findByAffiliateId(Long affiliateId, int page, int size) {
+        return em.createQuery(
+                        "SELECT a FROM Appointment a WHERE a.affiliate.id = :id ORDER BY a.date DESC, a.startTime DESC",
+                        Appointment.class)
+                .setParameter("id", affiliateId)
+                .setFirstResult(page * size)
+                .setMaxResults(size)
+                .getResultList();
+    }
+
+    @Override
+    public long countByAffiliateId(Long affiliateId) {
+        return em.createQuery(
+                        "SELECT COUNT(a) FROM Appointment a WHERE a.affiliate.id = :id", Long.class)
+                .setParameter("id", affiliateId)
+                .getSingleResult();
+    }
+
+    @Override
+    public List<Appointment> findBySpecialistId(Long specialistId, int page, int size) {
+        return em.createQuery(
+                        "SELECT a FROM Appointment a WHERE a.specialist.id = :id ORDER BY a.date DESC, a.startTime DESC",
+                        Appointment.class)
+                .setParameter("id", specialistId)
+                .setFirstResult(page * size)
+                .setMaxResults(size)
+                .getResultList();
+    }
+
+    @Override
+    public long countBySpecialistId(Long specialistId) {
+        return em.createQuery(
+                        "SELECT COUNT(a) FROM Appointment a WHERE a.specialist.id = :id", Long.class)
+                .setParameter("id", specialistId)
+                .getSingleResult();
     }
 }

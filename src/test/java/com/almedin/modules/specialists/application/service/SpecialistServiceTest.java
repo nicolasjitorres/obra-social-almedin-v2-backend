@@ -1,5 +1,6 @@
 package com.almedin.modules.specialists.application.service;
 
+import com.almedin.modules.shared.application.dto.PageRequest;
 import com.almedin.modules.shared.application.security.SecurityContext;
 import com.almedin.modules.specialists.application.dto.SpecialistRequest;
 import com.almedin.modules.specialists.application.dto.SpecialistResponse;
@@ -54,14 +55,16 @@ class SpecialistServiceTest {
     }
 
     @Test
-    void findAll_debeRetornarListaDeEspecialistas() {
-        when(specialistRepository.listAll()).thenReturn(List.of(specialist));
+    void findAll_debeRetornarPaginaDeEspecialistas() {
+        when(specialistRepository.listAll(0, 10, null)).thenReturn(List.of(specialist));
+        when(specialistRepository.countAll(null)).thenReturn(1L);
 
-        List<SpecialistResponse> result = specialistService.findAll();
+        var result = specialistService.findAll(new PageRequest(0, 10), null);
 
-        assertThat(result).hasSize(1);
-        assertThat(result.get(0).dni()).isEqualTo("22334455");
-        verify(specialistRepository, times(1)).listAll();
+        assertThat(result.content()).hasSize(1);
+        assertThat(result.content().get(0).dni()).isEqualTo("22334455");
+        assertThat(result.totalElements()).isEqualTo(1L);
+        verify(specialistRepository).listAll(0, 10, null);
     }
 
     @Test

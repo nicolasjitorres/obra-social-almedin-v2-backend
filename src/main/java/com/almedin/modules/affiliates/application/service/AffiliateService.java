@@ -7,6 +7,8 @@ import com.almedin.modules.affiliates.application.mapper.AffiliateMapper;
 import com.almedin.modules.affiliates.domain.exceptions.AffiliateNotFoundException;
 import com.almedin.modules.affiliates.domain.model.Affiliate;
 import com.almedin.modules.affiliates.domain.repository.AffiliateRepository;
+import com.almedin.modules.shared.application.dto.PageRequest;
+import com.almedin.modules.shared.application.dto.PageResponse;
 import com.almedin.modules.shared.application.security.SecurityContext;
 import com.almedin.modules.shared.domain.enums.Role;
 import com.almedin.modules.specialists.domain.model.Specialist;
@@ -28,8 +30,12 @@ public class AffiliateService {
     @Inject
     SecurityContext securityContext;
 
-    public List<AffiliateResponse> findAll() {
-        return affiliateMapper.toResponseList(affiliateRepository.listAll());
+    public PageResponse<AffiliateResponse> findAll(PageRequest pageRequest) {
+        List<AffiliateResponse> content = affiliateMapper.toResponseList(
+                affiliateRepository.listAll(pageRequest.page(), pageRequest.size())
+        );
+        long total = affiliateRepository.countAll();
+        return PageResponse.of(content, pageRequest, total);
     }
 
     public AffiliateResponse findById(Long id) {

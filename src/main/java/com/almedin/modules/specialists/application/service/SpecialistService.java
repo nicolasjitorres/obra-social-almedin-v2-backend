@@ -1,6 +1,8 @@
 package com.almedin.modules.specialists.application.service;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
+import com.almedin.modules.shared.application.dto.PageRequest;
+import com.almedin.modules.shared.application.dto.PageResponse;
 import com.almedin.modules.shared.application.security.SecurityContext;
 import com.almedin.modules.specialists.application.dto.SpecialistRequest;
 import com.almedin.modules.specialists.application.dto.SpecialistResponse;
@@ -26,10 +28,6 @@ public class SpecialistService {
 
     @Inject
     SecurityContext securityContext;
-
-    public List<SpecialistResponse> findAll() {
-        return specialistMapper.toResponseList(specialistRepository.listAll());
-    }
 
     public SpecialistResponse findById(Long id) {
         Specialist specialist = getOrThrow(id);
@@ -71,5 +69,13 @@ public class SpecialistService {
     private Specialist getOrThrow(Long id) {
         return specialistRepository.findById(id)
                 .orElseThrow(() -> new SpecialistNotFoundException(id));
+    }
+
+    public PageResponse<SpecialistResponse> findAll(PageRequest pageRequest, String speciality) {
+        List<SpecialistResponse> content = specialistMapper.toResponseList(
+                specialistRepository.listAll(pageRequest.page(), pageRequest.size(), speciality)
+        );
+        long total = specialistRepository.countAll(speciality);
+        return PageResponse.of(content, pageRequest, total);
     }
 }
