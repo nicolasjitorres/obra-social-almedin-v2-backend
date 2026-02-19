@@ -9,14 +9,17 @@ import java.util.Optional;
 
 public interface AppointmentRepository {
 
-    List<Appointment> listAll();
     Optional<Appointment> findById(Long id);
-    List<Appointment> findByAffiliateId(Long affiliateId);
-    List<Appointment> findBySpecialistId(Long specialistId);
     List<Appointment> findBySpecialistIdAndDate(Long specialistId, LocalDate date);
     List<Appointment> findByAffiliateIdAndStatus(Long affiliateId, AppointmentStatus status);
     List<Appointment> findBySpecialistIdAndDateRangeAndStatus(Long specialistId, LocalDate from, LocalDate to, AppointmentStatus status);
     void persist(Appointment appointment);
     void delete(Appointment appointment);
     List<Appointment> findConfirmedByDateAndReminderNotSent(LocalDate date);
+    List<Appointment> listAll(int page, int size, AppointmentStatus status);
+    long countAll(AppointmentStatus status);
+    List<Appointment> findByAffiliateId(Long affiliateId, int page, int size);
+    long countByAffiliateId(Long affiliateId);
+    List<Appointment> findBySpecialistId(Long specialistId, int page, int size);
+    long countBySpecialistId(Long specialistId);
 }

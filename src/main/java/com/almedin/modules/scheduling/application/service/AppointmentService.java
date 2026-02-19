@@ -7,6 +7,8 @@ import com.almedin.modules.scheduling.application.mapper.SchedulingMapper;
 import com.almedin.modules.scheduling.domain.exceptions.AppointmentNotFoundException;
 import com.almedin.modules.scheduling.domain.model.*;
 import com.almedin.modules.scheduling.domain.repository.*;
+import com.almedin.modules.shared.application.dto.PageRequest;
+import com.almedin.modules.shared.application.dto.PageResponse;
 import com.almedin.modules.shared.application.security.SecurityContext;
 import com.almedin.modules.shared.domain.enums.AppointmentStatus;
 import com.almedin.modules.shared.domain.enums.AppointmentType;
@@ -54,18 +56,6 @@ public class AppointmentService {
 
     @Inject
     SecurityContext securityContext;
-
-    public List<AppointmentResponse> findByAffiliate(Long affiliateId) {
-        securityContext.requireSelfOrAdmin(affiliateId);
-        return mapper.toAppointmentResponseList(
-                appointmentRepository.findByAffiliateId(affiliateId));
-    }
-
-    public List<AppointmentResponse> findBySpecialist(Long specialistId) {
-        securityContext.requireSelfOrAdmin(specialistId);
-        return mapper.toAppointmentResponseList(
-                appointmentRepository.findBySpecialistId(specialistId));
-    }
 
     public List<AppointmentResponse> findBySpecialistAndDate(Long specialistId, LocalDate date) {
         securityContext.requireSelfOrAdmin(specialistId);
@@ -288,5 +278,31 @@ public class AppointmentService {
     private Appointment getOrThrow(Long id) {
         return appointmentRepository.findById(id)
                 .orElseThrow(() -> new AppointmentNotFoundException(id));
+    }
+
+    public PageResponse<AppointmentResponse> findAll(PageRequest pageRequest, AppointmentStatus status) {
+        List<AppointmentResponse> content = mapper.toAppointmentResponseList(
+                appointmentRepository.listAll(pageRequest.page(), pageRequest.size(), status)
+        );
+        long total = appointmentRepository.countAll(status);
+        return PageResponse.of(content, pageRequest, total);
+    }
+
+    public PageResponse<AppointmentResponse> findByAffiliate(Long affiliateId, PageRequest pageRequest) {
+        securityContext.requireSelfOrAdmin(affiliateId);
+        List<AppointmentResponse> content = mapper.toAppointmentResponseList(
+                appointmentRepository.findByAffiliateId(affiliateId, pageRequest.page(), pageRequest.size())
+        );
+        long total = appointmentRepository.countByAffiliateId(affiliateId);
+        return PageResponse.of(content, pageRequest, total);
+    }
+
+    public PageResponse<AppointmentResponse> findBySpecialist(Long specialistId, PageRequest pageRequest) {
+        securityContext.requireSelfOrAdmin(specialistId);
+        List<AppointmentResponse> content = mapper.toAppointmentResponseList(
+                appointmentRepository.findBySpecialistId(specialistId, pageRequest.page(), pageRequest.size())
+        );
+        long total = appointmentRepository.countBySpecialistId(specialistId);
+        return PageResponse.of(content, pageRequest, total);
     }
 }

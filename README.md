@@ -12,7 +12,7 @@ Backend REST de un sistema de gestión de obra social médica, desarrollado con 
 [![Quarkus](https://img.shields.io/badge/Quarkus-3.31.3-blue?logo=quarkus)](https://quarkus.io/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue?logo=postgresql)](https://www.postgresql.org/)
 [![Docker](https://img.shields.io/badge/Docker-ready-2496ED?logo=docker)](https://www.docker.com/)
-[![Tests](https://img.shields.io/badge/Tests-118%20passing-brightgreen?logo=junit5)](https://github.com/nicolasjitorres/obra-social-almedin-v2-backend)
+[![Tests](https://img.shields.io/badge/Tests-119%20passing-brightgreen?logo=junit5)](https://github.com/nicolasjitorres/obra-social-almedin-v2-backend)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
 ---
@@ -319,25 +319,25 @@ openssl rsa -in private.pem -pubout -out public.pem
 
 ## 📝 Tests
 
-El proyecto cuenta con **112 tests** distribuidos en 3 niveles:
+El proyecto cuenta con **119 tests** distribuidos en 3 niveles:
 
 ```
-Tests run: 112, Failures: 0, Errors: 0, Skipped: 0
+Tests run: 119, Failures: 0, Errors: 0, Skipped: 0
 ```
 
 ### Distribución por módulo
 
-| Módulo | Unit Tests | Repository Tests | HTTP Tests | Total |
-|--------|-----------|-----------------|------------|-------|
-| Affiliates | 8 | 5 | 8 | 21 |
-| Specialists | 7 | 5 | 9 | 21 |
-| Scheduling | 13 | 10 | 19 | 42 |
-| Auth | 6 | — | 10 | 16 |
-| Notifications | 5 | — | — | 5 |
-| Security | — | — | 7 | 7 |
-| Rate Limiting | — | — | 3 | 3 |
-| Health Checks | — | — | 3 | 3 |
-| **Total** | **46** | **20** | **53** | **118** |
+| Módulo | Unit Tests | Repository Tests | HTTP Tests | Total   |
+|--------|------------|------------------|-----------|---------|
+| Affiliates | 8          | 5                | 8         | 21      |
+| Specialists | 7          | 5                | 9         | 21      |
+| Scheduling | 13         | 11               | 19        | 43      |
+| Auth | 6          | —                | 11        | 16      |
+| Notifications | 5          | —                | —         | 5       |
+| Security | 7          | —                | —          | 7       |
+| Rate Limiting | —          | —                | 3         | 3       |
+| Health Checks | —          | —                | 3         | 3       |
+| **Total** | **46**     | **22**           | **53**    | **119** |
 
 ### Ejecutar los tests
 

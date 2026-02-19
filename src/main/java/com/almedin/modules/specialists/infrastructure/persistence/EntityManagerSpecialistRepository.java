@@ -16,11 +16,6 @@ public class EntityManagerSpecialistRepository implements SpecialistRepository {
     EntityManager em;
 
     @Override
-    public List<Specialist> listAll() {
-        return em.createQuery("SELECT s FROM Specialist s WHERE s.active = true", Specialist.class).getResultList();
-    }
-
-    @Override
     public Optional<Specialist> findById(Long id) {
         return em.createQuery(
                         "SELECT s FROM Specialist s WHERE s.id = :id AND s.active = true", Specialist.class
@@ -56,5 +51,32 @@ public class EntityManagerSpecialistRepository implements SpecialistRepository {
     public void deactivate(Specialist specialist) {
         specialist.deactivate();
         em.merge(specialist);
+    }
+
+    @Override
+    public List<Specialist> listAll(int page, int size, String speciality) {
+        String jpql = speciality != null
+                ? "SELECT s FROM Specialist s WHERE s.active = true AND s.speciality = :speciality"
+                : "SELECT s FROM Specialist s WHERE s.active = true";
+
+        var query = em.createQuery(jpql, Specialist.class);
+        if (speciality != null) query.setParameter("speciality", speciality);
+
+        return query
+                .setFirstResult(page * size)
+                .setMaxResults(size)
+                .getResultList();
+    }
+
+    @Override
+    public long countAll(String speciality) {
+        String jpql = speciality != null
+                ? "SELECT COUNT(s) FROM Specialist s WHERE s.active = true AND s.speciality = :speciality"
+                : "SELECT COUNT(s) FROM Specialist s WHERE s.active = true";
+
+        var query = em.createQuery(jpql, Long.class);
+        if (speciality != null) query.setParameter("speciality", speciality);
+
+        return query.getSingleResult();
     }
 }

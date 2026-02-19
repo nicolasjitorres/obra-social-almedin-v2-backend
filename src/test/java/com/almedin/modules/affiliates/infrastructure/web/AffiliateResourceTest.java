@@ -36,12 +36,18 @@ class AffiliateResourceTest {
 
     @Test
     @Order(1)
-    void getAll_debeRetornar200() {
+    void getAll_debeRetornarPaginaConMetadata() {
         given()
-                .when().get(BASE_PATH)
+                .when().get(BASE_PATH + "?page=0&size=10")
                 .then()
                 .statusCode(200)
-                .contentType(ContentType.JSON);
+                .contentType(ContentType.JSON)
+                .body("content", notNullValue())
+                .body("page", equalTo(0))
+                .body("size", equalTo(10))
+                .body("totalElements", notNullValue())
+                .body("totalPages", notNullValue())
+                .body("first", equalTo(true));
     }
 
     @Test

@@ -5,6 +5,7 @@ import com.almedin.modules.affiliates.application.dto.AffiliateResponse;
 import com.almedin.modules.affiliates.domain.exceptions.AffiliateNotFoundException;
 import com.almedin.modules.affiliates.domain.model.Affiliate;
 import com.almedin.modules.affiliates.domain.repository.AffiliateRepository;
+import com.almedin.modules.shared.application.dto.PageRequest;
 import com.almedin.modules.shared.application.security.SecurityContext;
 import io.quarkus.test.InjectMock;
 import io.quarkus.test.junit.QuarkusTest;
@@ -52,14 +53,17 @@ class AffiliateServiceTest {
     }
 
     @Test
-    void findAll_debeRetornarListaDeAfiliados() {
-        when(affiliateRepository.listAll()).thenReturn(List.of(affiliate));
+    void findAll_debeRetornarPaginaDeAfiliados() {
+        when(affiliateRepository.listAll(0, 10)).thenReturn(List.of(affiliate));
+        when(affiliateRepository.countAll()).thenReturn(1L);
 
-        List<AffiliateResponse> result = affiliateService.findAll();
+        var result = affiliateService.findAll(new PageRequest(0, 10));
 
-        assertThat(result).hasSize(1);
-        assertThat(result.get(0).dni()).isEqualTo("12345678");
-        verify(affiliateRepository, times(1)).listAll();
+        assertThat(result.content()).hasSize(1);
+        assertThat(result.content().get(0).dni()).isEqualTo("12345678");
+        assertThat(result.totalElements()).isEqualTo(1L);
+        assertThat(result.totalPages()).isEqualTo(1);
+        verify(affiliateRepository).listAll(0, 10);
     }
 
     @Test

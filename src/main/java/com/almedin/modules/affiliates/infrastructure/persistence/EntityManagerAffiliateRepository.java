@@ -17,12 +17,6 @@ public class EntityManagerAffiliateRepository implements AffiliateRepository {
     EntityManager em;
 
     @Override
-    public List<Affiliate> listAll() {
-        return em.createQuery("SELECT a FROM Affiliate a WHERE a.active = true", Affiliate.class)
-                .getResultList();
-    }
-
-    @Override
     public Optional<Affiliate> findById(Long id) {
         return em.createQuery(
                         "SELECT a FROM Affiliate a WHERE a.id = :id AND a.active = true", Affiliate.class
@@ -68,5 +62,19 @@ public class EntityManagerAffiliateRepository implements AffiliateRepository {
                 .setParameter("code", healthInsuranceCode)
                 .getResultStream()
                 .findFirst();
+    }
+
+    @Override
+    public List<Affiliate> listAll(int page, int size) {
+        return em.createQuery("SELECT a FROM Affiliate a WHERE a.active = true", Affiliate.class)
+                .setFirstResult(page * size)
+                .setMaxResults(size)
+                .getResultList();
+    }
+
+    @Override
+    public long countAll() {
+        return em.createQuery("SELECT COUNT(a) FROM Affiliate a WHERE a.active = true", Long.class)
+                .getSingleResult();
     }
 }

@@ -1,5 +1,7 @@
 package com.almedin.modules.specialists.infrastructure.web;
 
+import com.almedin.modules.shared.application.dto.PageRequest;
+import com.almedin.modules.shared.application.dto.PageResponse;
 import com.almedin.modules.specialists.application.dto.SpecialistRequest;
 import com.almedin.modules.specialists.application.dto.SpecialistResponse;
 import com.almedin.modules.specialists.application.service.SpecialistService;
@@ -27,9 +29,11 @@ public class SpecialistResource {
 
     @GET
     @RolesAllowed({"ADMIN", "AFFILIATE"})
-    @Operation(summary = "Obtener todos los especialistas")
-    public Response getAll() {
-        return Response.ok(specialistService.findAll()).build();
+    public PageResponse<SpecialistResponse> findAll(
+            @QueryParam("page") @DefaultValue("0") int page,
+            @QueryParam("size") @DefaultValue("10") int size,
+            @QueryParam("speciality") String speciality) {
+        return specialistService.findAll(new PageRequest(page, size), speciality);
     }
 
     @GET

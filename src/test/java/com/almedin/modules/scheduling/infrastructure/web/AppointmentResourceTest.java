@@ -174,12 +174,15 @@ class AppointmentResourceTest {
 
     @Test
     @Order(8)
-    void getByAffiliate_debeRetornarCitas() {
+    void getByAffiliate_debeRetornarPaginaDeCitas() {
         given()
-                .when().get("/api/appointments/affiliate/" + affiliateId)
+                .when().get("/api/appointments/affiliate/" + affiliateId + "?page=0&size=10")
                 .then()
                 .statusCode(200)
-                .body("size()", greaterThan(0));
+                .body("content", notNullValue())
+                .body("content.size()", greaterThan(0))
+                .body("page", equalTo(0))
+                .body("first", equalTo(true));
     }
 
     @Test

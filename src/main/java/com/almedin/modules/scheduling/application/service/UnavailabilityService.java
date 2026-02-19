@@ -81,7 +81,7 @@ public class UnavailabilityService {
         SpecialistUnavailability u = unavailabilityRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Registro de no disponibilidad no encontrado con id: " + id));
         if (!securityContext.isAdmin()) {
-            securityContext.requireSelfOrAdmin(u.getSpecialist().getId()); // ← agregar
+            securityContext.requireSelfOrAdmin(u.getSpecialist().getId());
         }
         unavailabilityRepository.delete(u);
     }
