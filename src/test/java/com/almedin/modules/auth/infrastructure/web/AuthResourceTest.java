@@ -7,6 +7,9 @@ import com.almedin.modules.specialists.domain.model.Specialist;
 import com.almedin.modules.shared.domain.enums.Speciality;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.security.TestSecurity;
+import io.quarkus.test.security.jwt.Claim;
+import io.quarkus.test.security.jwt.JwtSecurity;
+import io.restassured.http.ContentType;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
@@ -227,5 +230,27 @@ class AuthResourceTest {
         return (Long) em.createQuery(
                         "SELECT a.id FROM Affiliate a WHERE a.email = 'juan@email.com'")
                 .getSingleResult();
+    }
+
+    @Test
+    @TestSecurity(user = "afiliado@almedin.com", roles = "AFFILIATE")
+    @JwtSecurity(claims = {@Claim(key = "userId", value = "99")})
+    void create_cuandoNoEsAdmin_debeRetornar403() {
+        given()
+                .contentType(ContentType.JSON)
+                .body("""
+                    {
+                        "firstName": "Test",
+                        "lastName": "User",
+                        "dni": "11111111",
+                        "email": "test@email.com",
+                        "speciality": "CARDIOLOGIA",
+                        "address": "Corrientes 100",
+                        "password": "pass123"
+                    }
+                    """)
+                .when().post("/api/specialists")
+                .then()
+                .statusCode(403);
     }
 }

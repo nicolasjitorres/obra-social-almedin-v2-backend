@@ -4,13 +4,14 @@ Backend REST de un sistema de gestión de obra social médica, desarrollado con 
 
 [![API Live](https://img.shields.io/badge/API-Live-brightgreen?logo=render)](https://obra-social-almedin-v2-backend-latest.onrender.com/q/swagger-ui)
 [![Swagger UI](https://img.shields.io/badge/Swagger-UI-85EA2D?logo=swagger&logoColor=black)](https://obra-social-almedin-v2-backend-latest.onrender.com/q/swagger-ui)
+[![Coverage](https://codecov.io/gh/nicolasjitorres/obra-social-almedin-v2-backend/branch/main/graph/badge.svg?token=XXXXXX)](https://codecov.io/gh/nicolasjitorres/obra-social-almedin-v2-backend)
 ![CI](https://github.com/nicolasjitorres/obra-social-almedin-v2-backend/actions/workflows/ci.yml/badge.svg)
 ![CD](https://github.com/nicolasjitorres/obra-social-almedin-v2-backend/actions/workflows/cd.yml/badge.svg)
 [![Java](https://img.shields.io/badge/Java-17-orange?logo=openjdk)](https://www.oracle.com/java/)
 [![Quarkus](https://img.shields.io/badge/Quarkus-3.31.3-blue?logo=quarkus)](https://quarkus.io/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue?logo=postgresql)](https://www.postgresql.org/)
 [![Docker](https://img.shields.io/badge/Docker-ready-2496ED?logo=docker)](https://www.docker.com/)
-[![Tests](https://img.shields.io/badge/Tests-99%20passing-brightgreen?logo=junit5)](https://github.com/nicolasjitorres/obra-social-almedin-v2-backend)
+[![Tests](https://img.shields.io/badge/Tests-112%20passing-brightgreen?logo=junit5)](https://github.com/nicolasjitorres/obra-social-almedin-v2-backend)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
 ---
@@ -310,22 +311,23 @@ openssl rsa -in private.pem -pubout -out public.pem
 
 ## 📝 Tests
 
-El proyecto cuenta con **94 tests** distribuidos en 3 niveles:
+El proyecto cuenta con **112 tests** distribuidos en 3 niveles:
 
 ```
-Tests run: 99, Failures: 0, Errors: 0, Skipped: 0
+Tests run: 112, Failures: 0, Errors: 0, Skipped: 0
 ```
 
 ### Distribución por módulo
 
 | Módulo | Unit Tests | Repository Tests | HTTP Tests | Total |
 |--------|-----------|-----------------|------------|-------|
-| Affiliates | 8 | 5 | 6 | 19 |
-| Specialists | 7 | 5 | 6 | 18 |
-| Scheduling | 13 | 9 | 19 | 41 |
+| Affiliates | 8 | 5 | 8 | 21 |
+| Specialists | 7 | 5 | 9 | 21 |
+| Scheduling | 13 | 10 | 19 | 42 |
 | Auth | 6 | — | 10 | 16 |
 | Notifications | 5 | — | — | 5 |
-| **Total** | **39** | **19** | **41** | **99** |
+| Security | — | — | 7 | 7 |
+| **Total** | **39** | **20** | **53** | **112** |
 
 ### Ejecutar los tests
 

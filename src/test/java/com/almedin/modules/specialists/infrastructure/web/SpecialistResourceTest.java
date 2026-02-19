@@ -115,4 +115,104 @@ class SpecialistResourceTest {
                 .then()
                 .statusCode(404);
     }
+
+    @Test
+    @Order(7)
+    void getById_cuandoExiste_debeRetornar200() {
+        // Primero creamos uno para tener un ID real
+        Integer id = given()
+                .contentType(ContentType.JSON)
+                .body("""
+                    {
+                        "firstName": "Carlos",
+                        "lastName": "Mendez",
+                        "dni": "11223344",
+                        "email": "carlos.mendez@email.com",
+                        "speciality": "NEUROLOGIA",
+                        "address": "Tucuman 500",
+                        "password": "password123"
+                    }
+                    """)
+                .when().post(BASE_PATH)
+                .then().statusCode(201)
+                .extract().path("id");
+
+        given()
+                .when().get(BASE_PATH + "/" + id)
+                .then()
+                .statusCode(200)
+                .body("id", equalTo(id))
+                .body("dni", equalTo("11223344"));
+    }
+
+    @Test
+    @Order(8)
+    void update_conDatosValidos_debeRetornar200() {
+        Integer id = given()
+                .contentType(ContentType.JSON)
+                .body("""
+                    {
+                        "firstName": "Marta",
+                        "lastName": "Lopez",
+                        "dni": "99887766",
+                        "email": "marta.lopez@email.com",
+                        "speciality": "DERMATOLOGIA",
+                        "address": "Rivadavia 100",
+                        "password": "password123"
+                    }
+                    """)
+                .when().post(BASE_PATH)
+                .then().statusCode(201)
+                .extract().path("id");
+
+        given()
+                .contentType(ContentType.JSON)
+                .body("""
+                    {
+                        "firstName": "Marta Beatriz",
+                        "lastName": "Lopez",
+                        "dni": "99887766",
+                        "email": "marta.lopez@email.com",
+                        "speciality": "ONCOLOGIA",
+                        "address": "Rivadavia 100",
+                        "password": "password123"
+                    }
+                    """)
+                .when().put(BASE_PATH + "/" + id)
+                .then()
+                .statusCode(200)
+                .body("firstName", equalTo("Marta Beatriz"))
+                .body("speciality", equalTo("ONCOLOGIA"));
+    }
+
+    @Test
+    @Order(9)
+    void delete_cuandoExiste_debeRetornar204() {
+        Integer id = given()
+                .contentType(ContentType.JSON)
+                .body("""
+                    {
+                        "firstName": "Juan",
+                        "lastName": "Perez",
+                        "dni": "77665544",
+                        "email": "juan.perez@email.com",
+                        "speciality": "UROLOGIA",
+                        "address": "Corrientes 800",
+                        "password": "password123"
+                    }
+                    """)
+                .when().post(BASE_PATH)
+                .then().statusCode(201)
+                .extract().path("id");
+
+        given()
+                .when().delete(BASE_PATH + "/" + id)
+                .then()
+                .statusCode(204);
+
+        given()
+                .when().get(BASE_PATH + "/" + id)
+                .then()
+                .statusCode(404);
+    }
 }
