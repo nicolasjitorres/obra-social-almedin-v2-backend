@@ -6,7 +6,7 @@ Backend REST de un sistema de gestión de obra social médica, desarrollado con 
 [![Java](https://img.shields.io/badge/Java-17-orange?logo=java)](https://www.oracle.com/java/)
 [![Quarkus](https://img.shields.io/badge/Quarkus-3.31.3-blue?logo=quarkus)](https://quarkus.io/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue?logo=postgresql)](https://www.postgresql.org/)
-[![Tests](https://img.shields.io/badge/Tests-94%20passing-brightgreen)](https://github.com/nicolasjitorres/obra-social-almedin-v2-backend)
+[![Tests](https://img.shields.io/badge/Tests-99%20passing-brightgreen)](https://github.com/nicolasjitorres/obra-social-almedin-v2-backend)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
 ---
