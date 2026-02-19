@@ -61,7 +61,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-      - name: Deploy en Railway
+      - name: Notificar deploy a Render
         run: |
-          curl -X POST "${{ secrets.RAILWAY_DEPLOY_WEBHOOK }}" \
+          curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}" \
             -H "Content-Type: application/json"
