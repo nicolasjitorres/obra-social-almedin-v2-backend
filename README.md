@@ -4,6 +4,7 @@ Backend REST de un sistema de gestión de obra social médica, desarrollado con 
 
 [![API Live](https://img.shields.io/badge/API-Live-brightgreen?logo=render)](https://obra-social-almedin-v2-backend-latest.onrender.com/q/swagger-ui)
 [![Swagger UI](https://img.shields.io/badge/Swagger-UI-85EA2D?logo=swagger&logoColor=black)](https://obra-social-almedin-v2-backend-latest.onrender.com/q/swagger-ui)
+[![Health](https://img.shields.io/badge/Health-UP-brightgreen)](https://obra-social-almedin-v2-backend-latest.onrender.com/q/health)
 [![Coverage](https://codecov.io/gh/nicolasjitorres/obra-social-almedin-v2-backend/branch/main/graph/badge.svg?token=XXXXXX)](https://codecov.io/gh/nicolasjitorres/obra-social-almedin-v2-backend)
 ![CI](https://github.com/nicolasjitorres/obra-social-almedin-v2-backend/actions/workflows/ci.yml/badge.svg)
 ![CD](https://github.com/nicolasjitorres/obra-social-almedin-v2-backend/actions/workflows/cd.yml/badge.svg)
@@ -11,7 +12,7 @@ Backend REST de un sistema de gestión de obra social médica, desarrollado con 
 [![Quarkus](https://img.shields.io/badge/Quarkus-3.31.3-blue?logo=quarkus)](https://quarkus.io/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue?logo=postgresql)](https://www.postgresql.org/)
 [![Docker](https://img.shields.io/badge/Docker-ready-2496ED?logo=docker)](https://www.docker.com/)
-[![Tests](https://img.shields.io/badge/Tests-112%20passing-brightgreen?logo=junit5)](https://github.com/nicolasjitorres/obra-social-almedin-v2-backend)
+[![Tests](https://img.shields.io/badge/Tests-118%20passing-brightgreen?logo=junit5)](https://github.com/nicolasjitorres/obra-social-almedin-v2-backend)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
 ---
@@ -63,18 +64,22 @@ El proyecto también fue una oportunidad para aprender y aplicar **arquitectura 
 | Framework | Quarkus 3.31.3 |
 | ORM | Hibernate ORM |
 | Base de datos | PostgreSQL 16 |
+| Migraciones | Flyway |
 | Autenticación | SmallRye JWT (RS256) |
 | Hash de contraseñas | BCrypt (at.favre.lib) |
 | Validación | Hibernate Validator |
 | Documentación API | SmallRye OpenAPI + Swagger UI |
 | Mapeo de objetos | MapStruct |
 | Email | Quarkus Mailer (SMTP / mock) |
-| Scheduler | Quarkus Scheduler (cron) |
+| Scheduler | Quarkus Scheduler |
+| Health Checks | SmallRye Health |
+| Rate Limiting | JAX-RS Filter |
 | Contenedores | Docker + Docker Compose |
 | Tests | JUnit 5 + Mockito + REST Assured |
 | Contenedores de test | Testcontainers |
-| Cobertura | JaCoCo |
-| CI | GitHub Actions |
+| Cobertura | JaCoCo + Codecov |
+| CI/CD | GitHub Actions |
+| Deploy | Render |
 | Build | Maven 3.9 |
 
 ---
@@ -217,6 +222,7 @@ Password: Admin1234!
 | Claves RSA | Par `private.pem` / `public.pem` — **nunca commiteadas en producción, se deben crear usando OpenSSL para pruebas** |
 | Secretos en producción | Configurables via variables de entorno (ver sección Variables de entorno) |
 | Autorización | Control de Acceso Basado en Roles (RBAC) |
+| Rate Limiting | 5 req/min en login, 100 req/min general — headers `X-RateLimit-*` en cada respuesta |
 | Errores de auth | 403 genérico para no exponer información sensible |
 
 ## 📧 Notificaciones por Email
@@ -263,13 +269,15 @@ cd obra-social-almedin-v2-backend
 docker-compose up --build
 ```
 
-Esto levanta PostgreSQL y la aplicación en un solo comando. La API queda disponible en `http://localhost:8080/api`.
+Esto levanta PostgreSQL y la aplicación en un solo comando.
 
-> El contenedor de la app espera que la base de datos esté lista antes de iniciar (healthcheck configurado).
+La API queda disponible en `http://localhost:8080/api`.  
+Swagger UI en `http://localhost:8080/q/swagger-ui`.  
+Health checks en `http://localhost:8080/q/health`.
 
 ---
 
-### 2 — Modo desarrollo
+### Opción 2 — Modo desarrollo
 
 Requiere Java 17+ y Maven 3.9+. Quarkus levanta PostgreSQL automáticamente via Docker:
 
@@ -327,7 +335,9 @@ Tests run: 112, Failures: 0, Errors: 0, Skipped: 0
 | Auth | 6 | — | 10 | 16 |
 | Notifications | 5 | — | — | 5 |
 | Security | — | — | 7 | 7 |
-| **Total** | **39** | **20** | **53** | **112** |
+| Rate Limiting | — | — | 3 | 3 |
+| Health Checks | — | — | 3 | 3 |
+| **Total** | **46** | **20** | **53** | **118** |
 
 ### Ejecutar los tests
 

@@ -104,6 +104,12 @@
             <artifactId>quarkus-flyway</artifactId>
         </dependency>
 
+        <!-- Health Checks -->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-smallrye-health</artifactId>
+        </dependency>
+
         <!-- Dependencias para los test-->
         <dependency>
             <groupId>io.quarkus</groupId>
