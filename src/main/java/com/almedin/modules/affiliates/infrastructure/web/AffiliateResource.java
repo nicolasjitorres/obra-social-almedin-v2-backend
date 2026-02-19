@@ -1,15 +1,21 @@
 package com.almedin.modules.affiliates.infrastructure.web;
 
+import com.almedin.modules.affiliates.application.dto.AffiliateRequest;
+import com.almedin.modules.affiliates.application.dto.AffiliateResponse;
 import com.almedin.modules.affiliates.application.service.AffiliateService;
-import com.almedin.modules.affiliates.infrastructure.mappers.AffiliateMapper;
-import com.almedin.modules.affiliates.infrastructure.web.dto.AffiliateDTO;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.media.Content;
+import org.eclipse.microprofile.openapi.annotations.media.ExampleObject;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
+
 import java.util.List;
 
 @Path("/api/affiliates")
@@ -21,46 +27,83 @@ public class AffiliateResource {
     @Inject
     AffiliateService affiliateService;
 
-    @Inject
-    AffiliateMapper affiliateMapper;
-
     @GET
+    @RolesAllowed("ADMIN")
     @Operation(summary = "Obtener todos los afiliados")
-    public List<AffiliateDTO> getAll() {
-        return affiliateMapper.toDTOList(affiliateService.findAll());
+    public List<AffiliateResponse> getAll() {
+        return affiliateService.findAll();
     }
 
     @GET
     @Path("/{id}")
+    @RolesAllowed({"ADMIN", "AFFILIATE"})
     @Operation(summary = "Obtener un afiliado por ID")
-    public AffiliateDTO getById(@PathParam("id") Long id) {
-        return affiliateMapper.toDTO(affiliateService.findById(id));
+    public AffiliateResponse getById(@PathParam("id") Long id) {
+        return affiliateService.findById(id);
     }
 
     @POST
+    @RolesAllowed("ADMIN")
     @Operation(summary = "Crear un nuevo afiliado")
-    public Response create(@Valid AffiliateDTO dto) {
-        var affiliate = affiliateMapper.toEntity(dto);
-        var created = affiliateService.create(affiliate);
-        return Response.status(Response.Status.CREATED)
-                .entity(affiliateMapper.toDTO(created))
-                .build();
+    @RequestBody(
+            required = true,
+            content = @Content(
+                    mediaType = MediaType.APPLICATION_JSON,
+                    schema = @Schema(implementation = AffiliateRequest.class),
+                    examples = @ExampleObject(
+                            name = "Ejemplo afiliado",
+                            summary = "Datos de un afiliado válido",
+                            value = """
+                    {
+                        "firstName": "Juan",
+                        "lastName": "Pérez",
+                        "dni": "12345678",
+                        "email": "juan.perez@email.com",
+                        "healthInsuranceCode": "HC-001"
+                    }
+                    """
+                    )
+            )
+    )
+    public Response create(@Valid AffiliateRequest request) {
+        AffiliateResponse created = affiliateService.create(request);
+        return Response.status(Response.Status.CREATED).entity(created).build();
     }
 
     @PUT
     @Path("/{id}")
+    @RolesAllowed("ADMIN")
     @Operation(summary = "Actualizar un afiliado existente")
-    public AffiliateDTO update(@PathParam("id") Long id, @Valid AffiliateDTO dto) {
-        var affiliateData = affiliateMapper.toEntity(dto);
-        var updated = affiliateService.update(id, affiliateData);
-        return affiliateMapper.toDTO(updated);
+    @RequestBody(
+            required = true,
+            content = @Content(
+                    mediaType = MediaType.APPLICATION_JSON,
+                    schema = @Schema(implementation = AffiliateRequest.class),
+                    examples = @ExampleObject(
+                            name = "Ejemplo actualización",
+                            summary = "Datos para actualizar un afiliado",
+                            value = """
+                    {
+                        "firstName": "Juan Carlos",
+                        "lastName": "Pérez",
+                        "dni": "12345678",
+                        "email": "juancarlos.perez@email.com",
+                        "healthInsuranceCode": "HC-001"
+                    }
+                    """
+                    )
+            )
+    )
+    public AffiliateResponse update(@PathParam("id") Long id, @Valid AffiliateRequest request) {
+        return affiliateService.update(id, request);
     }
 
     @DELETE
     @Path("/{id}")
-    @Operation(summary = "Eliminar un afiliado")
-    public Response delete(@PathParam("id") Long id) {
-        affiliateService.delete(id);
+    @RolesAllowed("ADMIN")
+    @Operation(summary = "Dar de baja un afiliado")
+    public Response deactivate(@PathParam("id") Long id) {
+        affiliateService.deactivate(id);
         return Response.noContent().build();
     }
 }

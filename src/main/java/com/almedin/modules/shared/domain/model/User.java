@@ -9,35 +9,49 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @MappedSuperclass
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@SuperBuilder
 public abstract class User {
 
     @NotBlank(message = "El nombre no puede estar vacío")
     @Size(min = 2, message = "El nombre debe tener al menos 2 caracteres")
     @Column(name = "first_name", nullable = false)
-    protected String firstName;
+    private String firstName;
 
     @NotBlank(message = "El apellido no puede estar vacío")
     @Size(min = 2, message = "El apellido debe tener al menos 2 caracteres")
     @Column(name = "last_name", nullable = false)
-    protected String lastName;
+    private String lastName;
 
     @NotBlank(message = "El DNI es obligatorio")
     @Pattern(regexp = "\\d{7,8}", message = "El DNI debe tener entre 7 y 8 dígitos numéricos")
     @Column(unique = true, nullable = false)
-    protected String dni;
+    private String dni;
 
     @NotBlank(message = "El email es obligatorio")
     @Email(message = "Debe proporcionar un email válido")
     @Column(unique = true, nullable = false)
-    protected String email;
+    private String email;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    protected Role role;
+    private Role role;
+
+    @Column(nullable = false)
+    private String password;
+
+    @Column(name = "active", nullable = false, columnDefinition = "boolean default true")
+    @Builder.Default
+    private boolean active = true;
+
+    public void deactivate() {
+        this.active = false;
+    }
 }
