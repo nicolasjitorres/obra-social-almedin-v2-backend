@@ -3,3 +3,9 @@
 !target/*-runner.jar
 !target/lib/*
 !target/quarkus-app/*
+target/**/quarkus-dev*
+.git
+.gitignore
+README.md
+*.md
+src/test
