@@ -12,9 +12,14 @@ public class SecurityContext {
     JsonWebToken jwt;
 
     public Long getCurrentUserId() {
-        Number userId = (Number) jwt.getClaim("userId");
+        Object userId = jwt.getClaim("userId");
         if (userId == null) throw new UnauthorizedException("Token inválido");
-        return userId.longValue();
+        if (userId instanceof Number) return ((Number) userId).longValue();
+        try {
+            return Long.parseLong(userId.toString());
+        } catch (NumberFormatException e) {
+            throw new UnauthorizedException("Token inválido");
+        }
     }
 
     public String getCurrentRole() {

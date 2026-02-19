@@ -114,4 +114,52 @@ class AffiliateResourceTest {
                 .then()
                 .statusCode(404);
     }
+
+    @Test
+    @Order(7)
+    void getById_cuandoExiste_debeRetornar200() {
+        Integer id = given()
+                .contentType(ContentType.JSON)
+                .body("""
+                    {
+                        "firstName": "Marta",
+                        "lastName": "Gomez",
+                        "dni": "99887766",
+                        "email": "marta@email.com",
+                        "healthInsuranceCode": "OS-005",
+                        "password": "password123"
+                    }
+                    """)
+                .when().post(BASE_PATH)
+                .then().statusCode(201)
+                .extract().path("id");
+
+        given()
+                .when().get(BASE_PATH + "/" + id)
+                .then()
+                .statusCode(200)
+                .body("id", equalTo(id))
+                .body("dni", equalTo("99887766"));
+    }
+
+    @Test
+    @Order(8)
+    void create_conNombreVacio_debeRetornar400() {
+        given()
+                .contentType(ContentType.JSON)
+                .body("""
+                    {
+                        "firstName": "",
+                        "lastName": "Ramirez",
+                        "dni": "33445566",
+                        "email": "ramirez@email.com",
+                        "healthInsuranceCode": "OS-006",
+                        "password": "password123"
+                    }
+                    """)
+                .when().post(BASE_PATH)
+                .then()
+                .statusCode(400)
+                .body("errors", not(empty()));
+    }
 }

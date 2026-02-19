@@ -203,11 +203,10 @@
                                 <exclude>**/*_Producer*</exclude>
                                 <exclude>**/*_Interceptor*</exclude>
                                 <exclude>**/io/quarkus/**</exclude>
-                                <exclude>**/dto/**</exclude>
-                                <exclude>**/request/**</exclude>
-                                <exclude>**/response/**</exclude>
-                                <exclude>**/domain/model/**</exclude>
                                 <exclude>**/*MapperImpl*</exclude>
+                                <exclude>**/application/service/**</exclude>
+                                <exclude>**/infrastructure/persistence/**</exclude>
+                                <exclude>**/infrastructure/notification/**</exclude>
                             </excludes>
                         </configuration>
                     </execution>
