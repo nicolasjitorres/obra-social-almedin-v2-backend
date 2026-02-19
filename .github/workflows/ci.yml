@@ -25,13 +25,21 @@ jobs:
       - name: Dar permisos a mvnw
         run: chmod +x mvnw
 
-      - name: Correr tests
+      - name: Correr tests y generar cobertura
         run: ./mvnw verify -B
         env:
           JWT_PRIVATE_KEY: ${{ secrets.JWT_PRIVATE_KEY }}
           JWT_PUBLIC_KEY: ${{ secrets.JWT_PUBLIC_KEY }}
 
-      - name: Publicar reporte de cobertura
+      - name: Subir reporte a Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: target/site/jacoco/jacoco.xml
+          fail_ci_if_error: false
+          verbose: true
+
+      - name: Publicar reporte HTML como artefacto
         if: always()
         uses: actions/upload-artifact@v4
         with:
