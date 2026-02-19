@@ -18,4 +18,5 @@ public interface AppointmentRepository {
     List<Appointment> findBySpecialistIdAndDateRangeAndStatus(Long specialistId, LocalDate from, LocalDate to, AppointmentStatus status);
     void persist(Appointment appointment);
     void delete(Appointment appointment);
+    List<Appointment> findConfirmedByDateAndReminderNotSent(LocalDate date);
 }

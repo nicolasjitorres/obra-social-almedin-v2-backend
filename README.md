@@ -257,11 +257,16 @@ java -jar target/quarkus-app/quarkus-run.jar
 
 ### 4. Variables de entorno (producción)
 
-| Variable | Descripción |
-|----------|-------------|
-| `DB_URL` | URL de conexión PostgreSQL |
-| `DB_USER` | Usuario de la base de datos |
-| `DB_PASSWORD` | Contraseña de la base de datos |
+| Variable      | Descripción                        |
+|---------------|------------------------------------|
+| `DB_URL`      | URL de conexión PostgreSQL         |
+| `DB_USER`     | Usuario de la base de datos        |
+| `DB_PASSWORD` | Contraseña de la base de datos     |
+| MAIL_HOST     | Servidor SMTP (ej: smtp.gmail.com) |
+| MAIL_PORT     | Puerto SMTP (ej: 587)              | 
+| MAIL_USERNAME | Usuario SMTP | 
+| MAIL_PASSWORD | Contraseña SMTP | 
+| MAIL_FROM | Dirección remitente |
 
 ---
 
