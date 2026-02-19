@@ -71,11 +71,11 @@ public class SpecialistService {
                 .orElseThrow(() -> new SpecialistNotFoundException(id));
     }
 
-    public PageResponse<SpecialistResponse> findAll(PageRequest pageRequest, String speciality) {
+    public PageResponse<SpecialistResponse> findAll(PageRequest pageRequest, String speciality, boolean includeInactive) {
         List<SpecialistResponse> content = specialistMapper.toResponseList(
-                specialistRepository.listAll(pageRequest.page(), pageRequest.size(), speciality)
+                specialistRepository.listAll(pageRequest.page(), pageRequest.size(), speciality, includeInactive)
         );
-        long total = specialistRepository.countAll(speciality);
+        long total = specialistRepository.countAll(speciality, includeInactive);
         return PageResponse.of(content, pageRequest, total);
     }
 }

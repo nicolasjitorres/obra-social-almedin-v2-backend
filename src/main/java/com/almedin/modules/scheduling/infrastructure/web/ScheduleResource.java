@@ -18,6 +18,9 @@ import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement;
+
+@SecurityRequirement(name = "bearerAuth")
 @Path("/api/schedules")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)

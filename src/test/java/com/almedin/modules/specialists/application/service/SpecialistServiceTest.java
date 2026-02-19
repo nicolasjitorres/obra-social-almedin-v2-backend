@@ -56,15 +56,15 @@ class SpecialistServiceTest {
 
     @Test
     void findAll_debeRetornarPaginaDeEspecialistas() {
-        when(specialistRepository.listAll(0, 10, null)).thenReturn(List.of(specialist));
-        when(specialistRepository.countAll(null)).thenReturn(1L);
+        when(specialistRepository.listAll(0, 10, null, false)).thenReturn(List.of(specialist));
+        when(specialistRepository.countAll(null, false)).thenReturn(1L);
 
-        var result = specialistService.findAll(new PageRequest(0, 10), null);
+        var result = specialistService.findAll(new PageRequest(0, 10), null, false);
 
         assertThat(result.content()).hasSize(1);
         assertThat(result.content().get(0).dni()).isEqualTo("22334455");
         assertThat(result.totalElements()).isEqualTo(1L);
-        verify(specialistRepository).listAll(0, 10, null);
+        verify(specialistRepository).listAll(0, 10, null, false);
     }
 
     @Test

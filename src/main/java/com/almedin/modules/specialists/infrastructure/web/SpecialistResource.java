@@ -18,6 +18,9 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 
+import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement;
+
+@SecurityRequirement(name = "bearerAuth")
 @Path("/api/specialists")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
@@ -32,8 +35,9 @@ public class SpecialistResource {
     public PageResponse<SpecialistResponse> findAll(
             @QueryParam("page") @DefaultValue("0") int page,
             @QueryParam("size") @DefaultValue("10") int size,
-            @QueryParam("speciality") String speciality) {
-        return specialistService.findAll(new PageRequest(page, size), speciality);
+            @QueryParam("speciality") String speciality,
+            @QueryParam("includeInactive") @DefaultValue("false") boolean includeInactive) {
+        return specialistService.findAll(new PageRequest(page, size), speciality, includeInactive);
     }
 
     @GET
