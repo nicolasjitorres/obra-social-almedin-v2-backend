@@ -2,10 +2,11 @@
 
 Backend REST de un sistema de gestión de obra social médica, desarrollado con **Quarkus 3** siguiendo **arquitectura hexagonal**. Permite la gestión de afiliados, especialistas, turnos, horarios y autenticación JWT con roles.
 
+![CI](https://github.com/nicolasjitorres/obra-social-almedin-v2-backend/actions/workflows/ci.yml/badge.svg)
 [![Java](https://img.shields.io/badge/Java-17-orange?logo=java)](https://www.oracle.com/java/)
 [![Quarkus](https://img.shields.io/badge/Quarkus-3.31.3-blue?logo=quarkus)](https://quarkus.io/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue?logo=postgresql)](https://www.postgresql.org/)
-[![Tests](https://img.shields.io/badge/Tests-94%20passing-brightgreen)](https://github.com/nicolasjitorres/obra-social-almedin-v2-backend)
+[![Tests](https://img.shields.io/badge/Tests-99%20passing-brightgreen)](https://github.com/nicolasjitorres/obra-social-almedin-v2-backend)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
 ---
@@ -257,11 +258,16 @@ java -jar target/quarkus-app/quarkus-run.jar
 
 ### 4. Variables de entorno (producción)
 
-| Variable | Descripción |
-|----------|-------------|
-| `DB_URL` | URL de conexión PostgreSQL |
-| `DB_USER` | Usuario de la base de datos |
-| `DB_PASSWORD` | Contraseña de la base de datos |
+| Variable      | Descripción                        |
+|---------------|------------------------------------|
+| `DB_URL`      | URL de conexión PostgreSQL         |
+| `DB_USER`     | Usuario de la base de datos        |
+| `DB_PASSWORD` | Contraseña de la base de datos     |
+| MAIL_HOST     | Servidor SMTP (ej: smtp.gmail.com) |
+| MAIL_PORT     | Puerto SMTP (ej: 587)              | 
+| MAIL_USERNAME | Usuario SMTP | 
+| MAIL_PASSWORD | Contraseña SMTP | 
+| MAIL_FROM | Dirección remitente |
 
 ---
 

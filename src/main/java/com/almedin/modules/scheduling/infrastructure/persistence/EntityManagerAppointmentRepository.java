@@ -83,4 +83,17 @@ public class EntityManagerAppointmentRepository implements AppointmentRepository
     public void delete(Appointment appointment) {
         em.remove(em.contains(appointment) ? appointment : em.merge(appointment));
     }
+
+    @Override
+    public List<Appointment> findConfirmedByDateAndReminderNotSent(LocalDate date) {
+        return em.createQuery(
+                        "SELECT a FROM Appointment a " +
+                                "WHERE a.date = :date " +
+                                "AND a.status = :status " +
+                                "AND a.reminderSent = false",
+                        Appointment.class)
+                .setParameter("date", date)
+                .setParameter("status", AppointmentStatus.CONFIRMADA)
+                .getResultList();
+    }
 }

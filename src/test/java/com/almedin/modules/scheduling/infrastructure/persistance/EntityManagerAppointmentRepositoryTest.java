@@ -188,4 +188,64 @@ class EntityManagerAppointmentRepositoryTest {
 
         assertThat(repository.findById(appointment.getId())).isEmpty();
     }
+
+    @Test
+    @Transactional
+    void findConfirmedByDateAndReminderNotSent_debeRetornarSoloLosCorrectos() {
+        LocalDate tomorrow = LocalDate.now().plusDays(1);
+
+        // Turno confirmado sin reminder debe aparecer
+        Appointment pending = Appointment.builder()
+                .affiliate(affiliate)
+                .specialist(specialist)
+                .date(tomorrow)
+                .startTime(LocalTime.of(10, 0))
+                .endTime(LocalTime.of(10, 30))
+                .durationMinutes(30)
+                .status(AppointmentStatus.CONFIRMADA)
+                .type(AppointmentType.CONSULTA)
+                .reminderSent(false)
+                .penaltyApplied(false)
+                .build();
+
+        // Turno confirmado con reminder ya enviado NO debe aparecer
+        Appointment alreadySent = Appointment.builder()
+                .affiliate(affiliate)
+                .specialist(specialist)
+                .date(tomorrow)
+                .startTime(LocalTime.of(11, 0))
+                .endTime(LocalTime.of(11, 30))
+                .durationMinutes(30)
+                .status(AppointmentStatus.CONFIRMADA)
+                .type(AppointmentType.CONSULTA)
+                .reminderSent(true)
+                .penaltyApplied(false)
+                .build();
+
+        // Turno cancelado NO debe aparecer
+        Appointment cancelled = Appointment.builder()
+                .affiliate(affiliate)
+                .specialist(specialist)
+                .date(tomorrow)
+                .startTime(LocalTime.of(12, 0))
+                .endTime(LocalTime.of(12, 30))
+                .durationMinutes(30)
+                .status(AppointmentStatus.CANCELADA)
+                .type(AppointmentType.CONSULTA)
+                .reminderSent(false)
+                .penaltyApplied(false)
+                .build();
+
+        em.persist(pending);
+        em.persist(alreadySent);
+        em.persist(cancelled);
+        em.flush();
+
+        List<Appointment> result =
+                repository.findConfirmedByDateAndReminderNotSent(tomorrow);
+
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getStartTime()).isEqualTo(LocalTime.of(10, 0));
+        assertThat(result.get(0).getReminderSent()).isFalse();
+    }
 }
