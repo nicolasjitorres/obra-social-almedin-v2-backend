@@ -70,7 +70,7 @@ public class AuthResource {
         return Response.ok(response).build();
     }
 
-    
+
     @OPTIONS
     @Path("/login")
     @PermitAll
