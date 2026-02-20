@@ -39,6 +39,8 @@ public class NotificationResource {
             JsonWebToken jwt = jwtParser.parse(token);
 
             Object groupsClaim = jwt.getClaim("groups");
+            System.out.println(">>> groups claim: " + groupsClaim);
+            System.out.println(">>> groups class: " + (groupsClaim != null ? groupsClaim.getClass().getName() : "null"));
             String groupsStr = groupsClaim != null ? groupsClaim.toString() : "";
 
             boolean isSpecialist = groupsStr.contains("SPECIALIST");
