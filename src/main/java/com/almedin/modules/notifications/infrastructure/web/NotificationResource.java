@@ -41,18 +41,16 @@ public class NotificationResource {
             if (groups == null) groups = Set.of();
             boolean isSpecialist = groups.contains("SPECIALIST");
             boolean isAdmin = groups.contains("ADMIN");
-            System.out.println(">>> groups claim: " + groups);
-            System.out.println("specialist: "+isSpecialist);
-            System.out.println("admin: "+isAdmin);
 
             if (!isSpecialist && !isAdmin) {
                 throw new ForbiddenException("Acceso denegado");
             }
 
             if (isSpecialist) {
-                Object userIdClaim = jwt.getClaim("userId");
-                Long tokenUserId = userIdClaim instanceof Number n ? n.longValue() : null;
-                if (tokenUserId == null || !tokenUserId.equals(specialistId.longValue())) {
+                String userIdClaim = jwt.getClaim("userId").toString();
+                Long userId = Long.valueOf(userIdClaim);
+                if (!userId.equals(specialistId)) {
+                    System.out.println("error de id");
                     throw new ForbiddenException("No podés acceder al stream de otro especialista");
                 }
             }
