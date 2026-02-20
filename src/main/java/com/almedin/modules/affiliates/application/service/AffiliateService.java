@@ -30,11 +30,11 @@ public class AffiliateService {
     @Inject
     SecurityContext securityContext;
 
-    public PageResponse<AffiliateResponse> findAll(PageRequest pageRequest) {
+    public PageResponse<AffiliateResponse> findAll(PageRequest pageRequest, boolean includeInactive) {
         List<AffiliateResponse> content = affiliateMapper.toResponseList(
-                affiliateRepository.listAll(pageRequest.page(), pageRequest.size())
+                affiliateRepository.listAll(pageRequest.page(), pageRequest.size(), includeInactive)
         );
-        long total = affiliateRepository.countAll();
+        long total = affiliateRepository.countAll(includeInactive);
         return PageResponse.of(content, pageRequest, total);
     }
 

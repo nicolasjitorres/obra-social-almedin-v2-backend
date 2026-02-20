@@ -15,6 +15,6 @@ public interface AffiliateRepository {
     Optional<Affiliate> findByHealthInsuranceCode(String healthInsuranceCode);
     void persist(Affiliate affiliate);
     void deactivate(Affiliate affiliate);
-    List<Affiliate> listAll(int page, int size);
-    long countAll();
+    List<Affiliate> listAll(int page, int size, boolean includeInactive);
+    long countAll(boolean includeInactive);
 }

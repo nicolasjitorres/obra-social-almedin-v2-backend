@@ -54,10 +54,12 @@ public class EntityManagerSpecialistRepository implements SpecialistRepository {
     }
 
     @Override
-    public List<Specialist> listAll(int page, int size, String speciality) {
+    public List<Specialist> listAll(int page, int size, String speciality, boolean includeInactive) {
+        String condition1 = includeInactive ? "" : " AND s.active = true";
+        String condition2 = includeInactive ? "" : " WHERE s.active = true";
         String jpql = speciality != null
-                ? "SELECT s FROM Specialist s WHERE s.active = true AND s.speciality = :speciality"
-                : "SELECT s FROM Specialist s WHERE s.active = true";
+                ? "SELECT s FROM Specialist s WHERE s.speciality = :speciality " + condition1
+                : "SELECT s FROM Specialist s " + condition2;
 
         var query = em.createQuery(jpql, Specialist.class);
         if (speciality != null) query.setParameter("speciality", speciality);
@@ -69,10 +71,12 @@ public class EntityManagerSpecialistRepository implements SpecialistRepository {
     }
 
     @Override
-    public long countAll(String speciality) {
+    public long countAll(String speciality, boolean includeInactive) {
+        String condition1 = includeInactive ? "" : " AND s.active = true";
+        String condition2 = includeInactive ? "" : " WHERE s.active = true";
         String jpql = speciality != null
-                ? "SELECT COUNT(s) FROM Specialist s WHERE s.active = true AND s.speciality = :speciality"
-                : "SELECT COUNT(s) FROM Specialist s WHERE s.active = true";
+                ? "SELECT COUNT(s) FROM Specialist s WHERE s.speciality = :speciality " + condition1
+                : "SELECT COUNT(s) FROM Specialist s " + condition2;
 
         var query = em.createQuery(jpql, Long.class);
         if (speciality != null) query.setParameter("speciality", speciality);

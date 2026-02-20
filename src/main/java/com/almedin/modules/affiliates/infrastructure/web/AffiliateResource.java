@@ -18,8 +18,9 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 
-import java.util.List;
+import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement;
 
+@SecurityRequirement(name = "bearerAuth")
 @Path("/api/affiliates")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
@@ -33,8 +34,9 @@ public class AffiliateResource {
     @RolesAllowed("ADMIN")
     public PageResponse<AffiliateResponse> findAll(
             @QueryParam("page") @DefaultValue("0") int page,
-            @QueryParam("size") @DefaultValue("10") int size) {
-        return affiliateService.findAll(new PageRequest(page, size));
+            @QueryParam("size") @DefaultValue("10") int size,
+            @QueryParam("includeInactive") @DefaultValue("false") boolean includeInactive) {
+        return affiliateService.findAll(new PageRequest(page, size), includeInactive);
     }
 
     @GET

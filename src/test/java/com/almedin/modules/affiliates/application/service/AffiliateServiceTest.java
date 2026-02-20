@@ -54,16 +54,16 @@ class AffiliateServiceTest {
 
     @Test
     void findAll_debeRetornarPaginaDeAfiliados() {
-        when(affiliateRepository.listAll(0, 10)).thenReturn(List.of(affiliate));
-        when(affiliateRepository.countAll()).thenReturn(1L);
+        when(affiliateRepository.listAll(0, 10,false)).thenReturn(List.of(affiliate));
+        when(affiliateRepository.countAll(false)).thenReturn(1L);
 
-        var result = affiliateService.findAll(new PageRequest(0, 10));
+        var result = affiliateService.findAll(new PageRequest(0, 10), false);
 
         assertThat(result.content()).hasSize(1);
         assertThat(result.content().get(0).dni()).isEqualTo("12345678");
         assertThat(result.totalElements()).isEqualTo(1L);
         assertThat(result.totalPages()).isEqualTo(1);
-        verify(affiliateRepository).listAll(0, 10);
+        verify(affiliateRepository).listAll(0, 10, false);
     }
 
     @Test

@@ -11,6 +11,6 @@ public interface SpecialistRepository {
     Optional<Specialist> findByEmail(String email);
     void persist(Specialist specialist);
     void deactivate(Specialist specialist);
-    List<Specialist> listAll(int page, int size, String speciality);
-    long countAll(String speciality);
+    List<Specialist> listAll(int page, int size, String speciality, boolean includeInactive);
+    long countAll(String speciality, boolean includeInactive);
 }

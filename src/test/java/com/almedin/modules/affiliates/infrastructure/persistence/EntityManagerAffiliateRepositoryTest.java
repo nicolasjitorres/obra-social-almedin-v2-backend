@@ -47,7 +47,7 @@ class EntityManagerAffiliateRepositoryTest {
     void persist_yListAll_debenFuncionar() {
         repository.persist(affiliate);
 
-        List<Affiliate> result = repository.listAll(0, 10);
+        List<Affiliate> result = repository.listAll(0, 10, false);
 
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getDni()).isEqualTo("87654321");

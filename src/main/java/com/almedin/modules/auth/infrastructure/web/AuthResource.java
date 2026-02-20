@@ -34,6 +34,15 @@ public class AuthResource {
                     schema = @Schema(implementation = AuthRequest.class),
                     examples = {
                             @ExampleObject(
+                                    name = "Login administrador",
+                                    value = """
+                        {
+                            "email": "admin@almedin.com",
+                            "password": "Admin1234!"
+                        }
+                        """
+                            ),
+                            @ExampleObject(
                                     name = "Login afiliado",
                                     value = """
                         {

@@ -65,16 +65,19 @@ public class EntityManagerAffiliateRepository implements AffiliateRepository {
     }
 
     @Override
-    public List<Affiliate> listAll(int page, int size) {
-        return em.createQuery("SELECT a FROM Affiliate a WHERE a.active = true", Affiliate.class)
+    public List<Affiliate> listAll(int page, int size, boolean includeInactive) {
+        String condition = includeInactive ? "" : " WHERE a.active = true";
+        return em.createQuery("SELECT a FROM Affiliate a" + condition, Affiliate.class)
                 .setFirstResult(page * size)
                 .setMaxResults(size)
                 .getResultList();
     }
 
     @Override
-    public long countAll() {
-        return em.createQuery("SELECT COUNT(a) FROM Affiliate a WHERE a.active = true", Long.class)
+    public long countAll(boolean includeInactive) {
+        String condition = includeInactive ? "" : " WHERE a.active = true";
+        return em.createQuery("SELECT COUNT(a) FROM Affiliate a" + condition, Long.class)
                 .getSingleResult();
     }
+
 }
