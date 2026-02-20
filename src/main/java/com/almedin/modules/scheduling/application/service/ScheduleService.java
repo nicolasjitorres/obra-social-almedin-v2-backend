@@ -11,6 +11,8 @@ import com.almedin.modules.shared.domain.enums.CancelledBy;
 import com.almedin.modules.shared.domain.enums.DayOfWeek;
 import com.almedin.modules.specialists.domain.model.Specialist;
 import com.almedin.modules.specialists.domain.repository.SpecialistRepository;
+import io.quarkus.cache.CacheInvalidate;
+import io.quarkus.cache.CacheResult;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -38,11 +40,13 @@ public class ScheduleService {
     @Inject
     SecurityContext securityContext;
 
+    @CacheResult(cacheName = "schedules")
     public List<ScheduleResponse> findBySpecialist(Long specialistId) {
         return mapper.toScheduleResponseList(scheduleRepository.findBySpecialistId(specialistId));
     }
 
     @Transactional
+    @CacheInvalidate(cacheName = "schedules")
     public ScheduleResponse create(ScheduleRequest request) {
 
         if (!securityContext.isAdmin()) {
@@ -68,6 +72,7 @@ public class ScheduleService {
     }
 
     @Transactional
+    @CacheInvalidate(cacheName = "schedules")
     public ScheduleResponse update(Long id, ScheduleRequest request) {
         Schedule existing = scheduleRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Horario no encontrado con id: " + id));
@@ -104,6 +109,7 @@ public class ScheduleService {
     }
 
     @Transactional
+    @CacheInvalidate(cacheName = "schedules")
     public void deactivate(Long id) {
         Schedule schedule = scheduleRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Horario no encontrado con id: " + id));

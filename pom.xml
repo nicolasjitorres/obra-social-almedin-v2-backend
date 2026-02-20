@@ -110,6 +110,12 @@
             <artifactId>quarkus-smallrye-health</artifactId>
         </dependency>
 
+        <!-- Caché -->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-cache</artifactId>
+        </dependency>
+
         <!-- Dependencias para los test-->
         <dependency>
             <groupId>io.quarkus</groupId>

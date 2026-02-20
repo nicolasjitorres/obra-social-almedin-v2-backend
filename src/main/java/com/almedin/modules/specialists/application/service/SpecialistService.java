@@ -17,6 +17,8 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.validation.ConstraintViolationException;
+import io.quarkus.cache.CacheResult;
+import io.quarkus.cache.CacheInvalidate;
 
 import java.util.List;
 
@@ -39,6 +41,7 @@ public class SpecialistService {
     }
 
     @Transactional
+    @CacheInvalidate(cacheName = "specialists")
     public SpecialistResponse create(SpecialistRequest request) {
         if (specialistRepository.findByDni(request.dni()).isPresent()) {
             throw new IllegalArgumentException("Ya existe un especialista con el DNI: " + request.dni());
@@ -52,6 +55,7 @@ public class SpecialistService {
     }
 
     @Transactional
+    @CacheInvalidate(cacheName = "specialists")
     public SpecialistResponse update(Long id, SpecialistRequest request) {
         Specialist existing = getOrThrow(id);
 
@@ -65,6 +69,7 @@ public class SpecialistService {
     }
 
     @Transactional
+    @CacheInvalidate(cacheName = "specialists")
     public void deactivate(Long id) {
         specialistRepository.deactivate(getOrThrow(id));
     }
@@ -74,6 +79,7 @@ public class SpecialistService {
                 .orElseThrow(() -> new SpecialistNotFoundException(id));
     }
 
+    @CacheResult(cacheName = "specialists")
     public PageResponse<SpecialistResponse> findAll(PageRequest pageRequest, String speciality, boolean includeInactive) {
         List<SpecialistResponse> content = specialistMapper.toResponseList(
                 specialistRepository.listAll(pageRequest.page(), pageRequest.size(), speciality, includeInactive)
