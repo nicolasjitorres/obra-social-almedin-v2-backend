@@ -32,7 +32,7 @@ public class UnavailabilityResource {
 
     @GET
     @Path("/specialist/{specialistId}")
-    @RolesAllowed({"ADMIN", "SPECIALIST"})
+    @RolesAllowed({"ADMIN", "SPECIALIST", "AFFILIATE"})
     @Operation(summary = "Obtener períodos de no disponibilidad de un especialista")
     public Response getBySpecialist(@PathParam("specialistId") Long specialistId) {
         return Response.ok(unavailabilityService.findBySpecialist(specialistId)).build();

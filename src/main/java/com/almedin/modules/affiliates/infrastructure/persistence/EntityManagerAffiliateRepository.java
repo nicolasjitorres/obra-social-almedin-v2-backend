@@ -80,4 +80,9 @@ public class EntityManagerAffiliateRepository implements AffiliateRepository {
                 .getSingleResult();
     }
 
+    @Override
+    public void update(Affiliate affiliate) {
+        em.merge(affiliate);
+    }
+
 }

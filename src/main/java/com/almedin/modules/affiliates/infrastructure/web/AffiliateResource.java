@@ -2,7 +2,9 @@ package com.almedin.modules.affiliates.infrastructure.web;
 
 import com.almedin.modules.affiliates.application.dto.AffiliateRequest;
 import com.almedin.modules.affiliates.application.dto.AffiliateResponse;
+import com.almedin.modules.affiliates.application.dto.UpdateAffiliateProfileRequest;
 import com.almedin.modules.affiliates.application.service.AffiliateService;
+import com.almedin.modules.shared.application.dto.ChangePasswordRequest;
 import com.almedin.modules.shared.application.dto.PageRequest;
 import com.almedin.modules.shared.application.dto.PageResponse;
 import jakarta.annotation.security.RolesAllowed;
@@ -60,11 +62,12 @@ public class AffiliateResource {
                             summary = "Datos de un afiliado válido",
                             value = """
                     {
-                        "firstName": "Juan",
-                        "lastName": "Pérez",
-                        "dni": "12345678",
-                        "email": "juan.perez@email.com",
-                        "healthInsuranceCode": "HC-001"
+                        "firstName": "John",
+                        "lastName": "Doe",
+                        "dni": "12334466",
+                        "email": "johndoe@mail.com",
+                        "healthInsuranceCode": "HC-099",
+                        "password": "password123"
                     }
                     """
                     )
@@ -109,6 +112,23 @@ public class AffiliateResource {
     @Operation(summary = "Dar de baja un afiliado")
     public Response deactivate(@PathParam("id") Long id) {
         affiliateService.deactivate(id);
+        return Response.noContent().build();
+    }
+
+    @PATCH
+    @Path("/{id}/profile")
+    @RolesAllowed("AFFILIATE")
+    @Operation(summary = "Afiliado actualiza su propio perfil")
+    public Response updateOwnProfile(@PathParam("id") Long id, @Valid UpdateAffiliateProfileRequest request) {
+        return Response.ok(affiliateService.updateProfile(id, request)).build();
+    }
+
+    @PATCH
+    @Path("/{id}/password")
+    @RolesAllowed({"AFFILIATE", "ADMIN", "SPECIALIST"})
+    @Operation(summary = "Cambiar contraseña")
+    public Response changePassword(@PathParam("id") Long id, @Valid ChangePasswordRequest request) {
+        affiliateService.changePassword(id, request);
         return Response.noContent().build();
     }
 }

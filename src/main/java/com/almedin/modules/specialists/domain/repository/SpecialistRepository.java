@@ -13,4 +13,5 @@ public interface SpecialistRepository {
     void deactivate(Specialist specialist);
     List<Specialist> listAll(int page, int size, String speciality, boolean includeInactive);
     long countAll(String speciality, boolean includeInactive);
+    void update(Specialist specialist);
 }

@@ -8,6 +8,8 @@ import com.almedin.modules.scheduling.domain.repository.UnavailabilityRepository
 import com.almedin.modules.shared.application.security.SecurityContext;
 import com.almedin.modules.specialists.domain.model.Specialist;
 import com.almedin.modules.specialists.domain.repository.SpecialistRepository;
+import io.quarkus.cache.CacheInvalidate;
+import io.quarkus.cache.CacheResult;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -29,16 +31,17 @@ public class UnavailabilityService {
     @Inject
     SecurityContext securityContext;
 
+    @CacheResult(cacheName = "unavailability")
     public List<UnavailabilityResponse> findBySpecialist(Long specialistId) {
-        securityContext.requireSelfOrAdmin(specialistId);
         return mapper.toUnavailabilityResponseList(
                 unavailabilityRepository.findBySpecialistId(specialistId));
     }
 
     @Transactional
+    @CacheInvalidate(cacheName = "unavailability")
     public List<UnavailabilityResponse> create(UnavailabilityRequest request) {
         if (!securityContext.isAdmin()) {
-            securityContext.requireSelfOrAdmin(request.specialistId()); // ← agregar
+            securityContext.requireSelfOrAdmin(request.specialistId());
         }
         Specialist specialist = specialistRepository.findById(request.specialistId())
                 .orElseThrow(() -> new IllegalArgumentException("Especialista no encontrado con id: " + request.specialistId()));
@@ -52,7 +55,7 @@ public class UnavailabilityService {
             throw new IllegalArgumentException("La hora de fin debe ser posterior a la hora de inicio");
         }
 
-        // Si hay rango de fechas, crear un registro por cada día
+        // Si hay rango de fechas, crear un registro por cada dia
         List<SpecialistUnavailability> created = new java.util.ArrayList<>();
 
         if (request.dateTo() != null) {
@@ -77,6 +80,7 @@ public class UnavailabilityService {
     }
 
     @Transactional
+    @CacheInvalidate(cacheName = "unavailability")
     public void delete(Long id) {
         SpecialistUnavailability u = unavailabilityRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Registro de no disponibilidad no encontrado con id: " + id));

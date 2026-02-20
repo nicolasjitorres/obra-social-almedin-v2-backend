@@ -5,6 +5,7 @@ import com.almedin.modules.specialists.domain.repository.SpecialistRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -82,5 +83,10 @@ public class EntityManagerSpecialistRepository implements SpecialistRepository {
         if (speciality != null) query.setParameter("speciality", speciality);
 
         return query.getSingleResult();
+    }
+
+    @Override
+    public void update(Specialist specialist) {
+        em.merge(specialist);
     }
 }

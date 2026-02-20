@@ -8,7 +8,9 @@ import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.NewCookie;
 import jakarta.ws.rs.core.Response;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.ExampleObject;
@@ -25,10 +27,14 @@ public class AuthResource {
     @Inject
     AuthService authService;
 
+    @ConfigProperty(name = "app.cookie.secure")
+    boolean cookieSecure;
+
     @POST
     @Path("/login")
     @PermitAll
     @Operation(summary = "Iniciar sesión y obtener token JWT")
+    @PermitAll
     @RequestBody(
             required = true,
             content = @Content(
@@ -48,7 +54,7 @@ public class AuthResource {
                                     name = "Login afiliado",
                                     value = """
                         {
-                            "email": "juan.perez@email.com",
+                            "email": "johndoe@mail.com",
                             "password": "password123"
                         }
                         """
@@ -66,8 +72,32 @@ public class AuthResource {
             )
     )
     public Response login(@Valid AuthRequest request) {
-        AuthResponse response = authService.login(request);
-        return Response.ok(response).build();
+        AuthResponse auth = authService.login(request);
+
+        NewCookie cookie = new NewCookie.Builder("auth_token")
+                .value(auth.token())
+                .httpOnly(true)
+                .secure(cookieSecure)
+                .sameSite(NewCookie.SameSite.STRICT)
+                .maxAge(8 * 60 * 60)
+                .path("/")
+                .build();
+
+        return Response.ok(auth).cookie(cookie).build();
+    }
+    @POST
+    @Path("/logout")
+    @PermitAll
+    public Response logout() {
+        NewCookie expired = new NewCookie.Builder("auth_token")
+                .value("")
+                .httpOnly(true)
+                .secure(cookieSecure)
+                .maxAge(0)
+                .path("/")
+                .build();
+
+        return Response.ok().cookie(expired).build();
     }
 
 
