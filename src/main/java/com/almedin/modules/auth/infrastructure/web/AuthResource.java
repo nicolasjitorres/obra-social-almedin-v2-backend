@@ -46,7 +46,7 @@ public class AuthResource {
                                     name = "Login afiliado",
                                     value = """
                         {
-                            "email": "juan.perez@email.com",
+                            "email": "johndoe@mail.com",
                             "password": "password123"
                         }
                         """

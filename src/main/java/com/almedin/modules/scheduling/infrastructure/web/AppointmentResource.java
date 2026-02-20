@@ -194,4 +194,21 @@ public class AppointmentResource {
     public Response markAsAbsent(@PathParam("id") Long id) {
         return Response.ok(appointmentService.markAsAbsent(id)).build();
     }
+
+    @POST
+    @Path("/{id}/derive")
+    @RolesAllowed("SPECIALIST")
+    @Operation(summary = "Crear segunda cita derivada")
+    public Response derive(@PathParam("id") Long parentId, @Valid DeriveAppointmentRequest request) {
+        AppointmentRequest apptRequest = new AppointmentRequest(
+                request.affiliateId(),
+                request.specialistId(),
+                request.date(),
+                request.startTime(),
+                request.type(),
+                parentId
+        );
+        return Response.status(Response.Status.CREATED)
+                .entity(appointmentService.create(apptRequest)).build();
+    }
 }

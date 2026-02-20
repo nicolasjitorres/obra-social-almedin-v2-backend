@@ -2,6 +2,7 @@ package com.almedin.modules.specialists.application.mapper;
 
 import com.almedin.modules.specialists.application.dto.SpecialistRequest;
 import com.almedin.modules.specialists.application.dto.SpecialistResponse;
+import com.almedin.modules.specialists.application.dto.UpdateSpecialistProfileRequest;
 import com.almedin.modules.specialists.domain.model.Specialist;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -28,4 +29,12 @@ public interface SpecialistMapper {
     @Mapping(target = "active", ignore = true)
     @Mapping(target = "password", ignore = true)
     void updateEntityFromRequest(SpecialistRequest request, @MappingTarget Specialist specialist);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "role", ignore = true)
+    @Mapping(target = "active", ignore = true)
+    @Mapping(target = "password", ignore = true)
+    @Mapping(target = "dni", ignore = true)
+    @Mapping(target = "speciality", ignore = true)
+    void updateSelfEntityFromRequest(UpdateSpecialistProfileRequest request, @MappingTarget Specialist specialist);
 }

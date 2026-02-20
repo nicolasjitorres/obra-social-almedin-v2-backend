@@ -1,9 +1,11 @@
 package com.almedin.modules.specialists.infrastructure.web;
 
+import com.almedin.modules.shared.application.dto.ChangePasswordRequest;
 import com.almedin.modules.shared.application.dto.PageRequest;
 import com.almedin.modules.shared.application.dto.PageResponse;
 import com.almedin.modules.specialists.application.dto.SpecialistRequest;
 import com.almedin.modules.specialists.application.dto.SpecialistResponse;
+import com.almedin.modules.specialists.application.dto.UpdateSpecialistProfileRequest;
 import com.almedin.modules.specialists.application.service.SpecialistService;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
@@ -114,4 +116,22 @@ public class SpecialistResource {
         specialistService.deactivate(id);
         return Response.noContent().build();
     }
+
+    @PATCH
+    @Path("/{id}/profile")
+    @RolesAllowed("SPECIALIST")
+    @Operation(summary = "Especialista actualiza su propio perfil")
+    public Response updateOwnProfile(@PathParam("id") Long id, @Valid UpdateSpecialistProfileRequest request) {
+        return Response.ok(specialistService.updateProfile(id, request)).build();
+    }
+
+    @PATCH
+    @Path("/{id}/password")
+    @RolesAllowed({"SPECIALIST", "AFFILIATE", "ADMIN"})
+    @Operation(summary = "Cambiar contraseña")
+    public Response changePassword(@PathParam("id") Long id, @Valid ChangePasswordRequest request) {
+        specialistService.changePassword(id, request);
+        return Response.noContent().build();
+    }
+
 }

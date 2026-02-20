@@ -1,11 +1,13 @@
 package com.almedin.modules.specialists.application.service;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
+import com.almedin.modules.shared.application.dto.ChangePasswordRequest;
 import com.almedin.modules.shared.application.dto.PageRequest;
 import com.almedin.modules.shared.application.dto.PageResponse;
 import com.almedin.modules.shared.application.security.SecurityContext;
 import com.almedin.modules.specialists.application.dto.SpecialistRequest;
 import com.almedin.modules.specialists.application.dto.SpecialistResponse;
+import com.almedin.modules.specialists.application.dto.UpdateSpecialistProfileRequest;
 import com.almedin.modules.specialists.application.mapper.SpecialistMapper;
 import com.almedin.modules.specialists.domain.exceptions.SpecialistNotFoundException;
 import com.almedin.modules.specialists.domain.model.Specialist;
@@ -14,6 +16,7 @@ import com.almedin.modules.shared.domain.enums.Role;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import jakarta.validation.ConstraintViolationException;
 
 import java.util.List;
 
@@ -78,4 +81,23 @@ public class SpecialistService {
         long total = specialistRepository.countAll(speciality, includeInactive);
         return PageResponse.of(content, pageRequest, total);
     }
+
+    @Transactional
+    public SpecialistResponse updateProfile(Long id, UpdateSpecialistProfileRequest request) {
+        Specialist existing = getOrThrow(id);
+        specialistMapper.updateSelfEntityFromRequest(request, existing);
+        return specialistMapper.toResponse(existing);
+    }
+
+    @Transactional
+    public void changePassword(Long id, ChangePasswordRequest request) {
+        Specialist existing = getOrThrow(id);
+        if (!BCrypt.verifyer().verify(request.currentPassword().toCharArray(), existing.getPassword()).verified) {
+            throw new ConstraintViolationException("Contraseña actual incorrecta", null);
+        }
+        existing.setPassword(BCrypt.withDefaults().hashToString(12, request.newPassword().toCharArray()));
+        specialistRepository.update(existing);
+    }
+
+
 }

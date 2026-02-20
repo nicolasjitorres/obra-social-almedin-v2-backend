@@ -30,7 +30,6 @@ public class UnavailabilityService {
     SecurityContext securityContext;
 
     public List<UnavailabilityResponse> findBySpecialist(Long specialistId) {
-        securityContext.requireSelfOrAdmin(specialistId);
         return mapper.toUnavailabilityResponseList(
                 unavailabilityRepository.findBySpecialistId(specialistId));
     }
@@ -38,7 +37,7 @@ public class UnavailabilityService {
     @Transactional
     public List<UnavailabilityResponse> create(UnavailabilityRequest request) {
         if (!securityContext.isAdmin()) {
-            securityContext.requireSelfOrAdmin(request.specialistId()); // ← agregar
+            securityContext.requireSelfOrAdmin(request.specialistId());
         }
         Specialist specialist = specialistRepository.findById(request.specialistId())
                 .orElseThrow(() -> new IllegalArgumentException("Especialista no encontrado con id: " + request.specialistId()));

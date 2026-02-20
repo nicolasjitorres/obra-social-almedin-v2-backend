@@ -17,4 +17,5 @@ public interface AffiliateRepository {
     void deactivate(Affiliate affiliate);
     List<Affiliate> listAll(int page, int size, boolean includeInactive);
     long countAll(boolean includeInactive);
+    void update(Affiliate affiliate);
 }
