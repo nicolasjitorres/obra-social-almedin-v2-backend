@@ -34,7 +34,6 @@ public class AuthResource {
     @Path("/login")
     @PermitAll
     @Operation(summary = "Iniciar sesión y obtener token JWT")
-    @PermitAll
     @RequestBody(
             required = true,
             content = @Content(
