@@ -2,6 +2,8 @@ package com.almedin.modules.scheduling.application.service;
 
 import com.almedin.modules.affiliates.domain.model.Affiliate;
 import com.almedin.modules.affiliates.domain.repository.AffiliateRepository;
+import com.almedin.modules.notifications.application.service.NotificationService;
+import com.almedin.modules.notifications.domain.model.NotificationEvent;
 import com.almedin.modules.scheduling.application.dto.*;
 import com.almedin.modules.scheduling.application.mapper.SchedulingMapper;
 import com.almedin.modules.scheduling.domain.exceptions.AppointmentNotFoundException;
@@ -56,6 +58,9 @@ public class AppointmentService {
 
     @Inject
     SecurityContext securityContext;
+
+    @Inject
+    NotificationService notificationService;
 
     public List<AppointmentResponse> findBySpecialistAndDate(Long specialistId, LocalDate date) {
         securityContext.requireSelfOrAdmin(specialistId);
@@ -167,6 +172,15 @@ public class AppointmentService {
                 .build();
 
         appointmentRepository.persist(appointment);
+
+        notificationService.notify(specialist.getId(), new NotificationEvent(
+                "NEW_APPOINTMENT",
+                specialist.getId(),
+                "Nuevo turno: " + affiliate.getFirstName() + " " + affiliate.getLastName() +
+                        " — " + request.date() + " " + request.startTime(),
+                java.time.LocalDateTime.now().toString()
+        ));
+
         return mapper.toAppointmentResponse(appointment);
     }
 
@@ -209,6 +223,17 @@ public class AppointmentService {
         appointment.setCancelledBy(request.cancelledBy());
         appointment.setCancellationReason(request.reason());
         appointment.setPenaltyApplied(applyPenalty);
+
+        if (request.cancelledBy() == CancelledBy.AFFILIATE) {
+            notificationService.notify(appointment.getSpecialist().getId(), new NotificationEvent(
+                    "CANCELLED",
+                    appointment.getSpecialist().getId(),
+                    "Turno cancelado: " + appointment.getAffiliate().getFirstName() +
+                            " " + appointment.getAffiliate().getLastName() +
+                            " — " + appointment.getDate() + " " + appointment.getStartTime(),
+                    java.time.LocalDateTime.now().toString()
+            ));
+        }
 
         return mapper.toAppointmentResponse(appointment);
     }
