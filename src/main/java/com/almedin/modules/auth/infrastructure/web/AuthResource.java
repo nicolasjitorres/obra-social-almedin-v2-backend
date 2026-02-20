@@ -77,7 +77,7 @@ public class AuthResource {
                 .value(auth.token())
                 .httpOnly(true)
                 .secure(cookieSecure)
-                .sameSite(NewCookie.SameSite.STRICT)
+                .sameSite(NewCookie.SameSite.NONE)
                 .maxAge(8 * 60 * 60)
                 .path("/")
                 .build();
