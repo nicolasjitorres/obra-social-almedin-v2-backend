@@ -37,14 +37,13 @@ public class NotificationResource {
 
         try {
             JsonWebToken jwt = jwtParser.parse(token);
-
-            Object groupsClaim = jwt.getClaim("groups");
-            System.out.println(">>> groups claim: " + groupsClaim);
-            System.out.println(">>> groups class: " + (groupsClaim != null ? groupsClaim.getClass().getName() : "null"));
-            String groupsStr = groupsClaim != null ? groupsClaim.toString() : "";
-
-            boolean isSpecialist = groupsStr.contains("SPECIALIST");
-            boolean isAdmin      = groupsStr.contains("ADMIN");
+            Set<String> groups = jwt.getClaim("groups");
+            if (groups == null) groups = Set.of();
+            boolean isSpecialist = groups.contains("SPECIALIST");
+            boolean isAdmin = groups.contains("ADMIN");
+            System.out.println(">>> groups claim: " + groups);
+            System.out.println("specialist: "+isSpecialist);
+            System.out.println("admin: "+isAdmin);
 
             if (!isSpecialist && !isAdmin) {
                 throw new ForbiddenException("Acceso denegado");
