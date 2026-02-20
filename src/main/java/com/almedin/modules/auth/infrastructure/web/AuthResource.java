@@ -26,7 +26,6 @@ public class AuthResource {
     AuthService authService;
 
     @POST
-    @OPTIONS
     @Path("/login")
     @PermitAll
     @Operation(summary = "Iniciar sesión y obtener token JWT")
@@ -69,5 +68,13 @@ public class AuthResource {
     public Response login(@Valid AuthRequest request) {
         AuthResponse response = authService.login(request);
         return Response.ok(response).build();
+    }
+
+    
+    @OPTIONS
+    @Path("/login")
+    @PermitAll
+    public Response loginOptions() {
+        return Response.ok().build();
     }
 }
