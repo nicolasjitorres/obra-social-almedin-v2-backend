@@ -3,6 +3,7 @@ package com.almedin.modules.auth.infrastructure.web;
 import com.almedin.modules.auth.application.dto.AuthRequest;
 import com.almedin.modules.auth.application.dto.AuthResponse;
 import com.almedin.modules.auth.application.service.AuthService;
+import jakarta.annotation.security.PermitAll;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
@@ -25,7 +26,9 @@ public class AuthResource {
     AuthService authService;
 
     @POST
+    @OPTIONS
     @Path("/login")
+    @PermitAll
     @Operation(summary = "Iniciar sesión y obtener token JWT")
     @RequestBody(
             required = true,
