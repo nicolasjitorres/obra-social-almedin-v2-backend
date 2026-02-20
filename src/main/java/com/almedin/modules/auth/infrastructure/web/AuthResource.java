@@ -32,6 +32,7 @@ public class AuthResource {
 
     @POST
     @Path("/login")
+    @PermitAll
     @Operation(summary = "Iniciar sesión y obtener token JWT")
     @PermitAll
     @RequestBody(
@@ -97,5 +98,13 @@ public class AuthResource {
                 .build();
 
         return Response.ok().cookie(expired).build();
+    }
+
+
+    @OPTIONS
+    @Path("/login")
+    @PermitAll
+    public Response loginOptions() {
+        return Response.ok().build();
     }
 }
