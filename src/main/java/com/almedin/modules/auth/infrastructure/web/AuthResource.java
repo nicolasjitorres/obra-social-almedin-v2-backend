@@ -92,6 +92,7 @@ public class AuthResource {
                 .value("")
                 .httpOnly(true)
                 .secure(cookieSecure)
+                .sameSite(NewCookie.SameSite.NONE)
                 .maxAge(0)
                 .path("/")
                 .build();

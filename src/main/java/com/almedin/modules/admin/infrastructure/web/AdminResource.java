@@ -13,6 +13,7 @@ import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 
 import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement;
 
@@ -29,8 +30,9 @@ public class AdminResource {
     @GET
     @Path("/dashboard")
     public Response getDashboardStats() {
-        LocalDate today = LocalDate.now();
+        LocalDate today = LocalDate.now(ZoneId.of("America/Argentina/Buenos_Aires"));
         LocalDate firstOfMonth = today.withDayOfMonth(1);
+        LocalDate lastOfMonth = today.withDayOfMonth(today.lengthOfMonth());
 
         long totalAffiliates = (long) em.createQuery(
                 "SELECT COUNT(a) FROM Affiliate a").getSingleResult();
@@ -51,11 +53,11 @@ public class AdminResource {
         long appointmentsThisMonth = (long) em.createQuery(
                         "SELECT COUNT(a) FROM Appointment a WHERE a.date >= :from AND a.date <= :to")
                 .setParameter("from", firstOfMonth)
-                .setParameter("to", today).getSingleResult();
+                .setParameter("to", lastOfMonth).getSingleResult();
 
         long pendingAppointments = (long) em.createQuery(
                         "SELECT COUNT(a) FROM Appointment a WHERE a.status = :status")
-                .setParameter("status", AppointmentStatus.PENDIENTE)
+                .setParameter("status", AppointmentStatus.CONFIRMADA)
                 .getSingleResult();
 
         long completedAppointments = (long) em.createQuery(

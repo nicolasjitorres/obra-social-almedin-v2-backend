@@ -81,6 +81,8 @@ El proyecto también fue una oportunidad para aprender y aplicar **arquitectura 
 | CI/CD | GitHub Actions |
 | Deploy | Render |
 | Build | Maven 3.9 |
+| Caché | Quarkus Cache (Caffeine) |
+| Notificaciones RT | Server-Sent Events (SSE) con Mutiny |
 
 ---
 
@@ -181,6 +183,22 @@ El proyecto implementa **arquitectura hexagonal** , separando claramente el domi
 | `POST` | `/api/schedules/specialist/{id}/unavailability` | Registrar indisponibilidad | SPECIALIST |
 
 ---
+### 🔑 Auth
+
+| Método | Endpoint | Descripción | Acceso |
+|--------|----------|-------------|--------|
+| `POST` | `/api/auth/login` | Login, retorna JWT + setea cookie HttpOnly | Público |
+| `POST` | `/api/auth/logout` | Logout, invalida la cookie de sesión | Público |
+
+---
+
+### 🔔 Notificaciones — `/api/notifications`
+
+| Método | Endpoint | Descripción | Roles |
+|--------|----------|-------------|-------|
+| `GET` | `/api/notifications/stream/{specialistId}` |Stream SSE de notificaciones en tiempo real | SPECIALIST, ADMIN |
+
+---
 
 ## 🔒 Autenticación JWT
 
@@ -224,6 +242,7 @@ Password: Admin1234!
 | Autorización | Control de Acceso Basado en Roles (RBAC) |
 | Rate Limiting | 5 req/min en login, 100 req/min general — headers `X-RateLimit-*` en cada respuesta |
 | Errores de auth | 403 genérico para no exponer información sensible |
+| SSE Auth | Cookie HttpOnly con JWT — EventSource no soporta headers Authorization |
 
 ## 📧 Notificaciones por Email
 
