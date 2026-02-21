@@ -126,8 +126,8 @@ El proyecto implementa **arquitectura hexagonal** , separando claramente el domi
 
 | Método | Endpoint | Descripción | Acceso |
 |--------|----------|-------------|--------|
-| `POST` | `/api/auth/login` | Login y obtención de JWT | Público |
-
+| `POST` | `/api/auth/login` | Login, retorna JWT + setea cookie HttpOnly | Público |
+| `POST` | `/api/auth/logout` | Logout, invalida la cookie de sesión | Público |
 
 ---
 
@@ -181,14 +181,6 @@ El proyecto implementa **arquitectura hexagonal** , separando claramente el domi
 | `PUT` | `/api/schedules/{id}` | Actualizar horario | SPECIALIST |
 | `DELETE` | `/api/schedules/{id}` | Desactivar horario | SPECIALIST |
 | `POST` | `/api/schedules/specialist/{id}/unavailability` | Registrar indisponibilidad | SPECIALIST |
-
----
-### 🔑 Auth
-
-| Método | Endpoint | Descripción | Acceso |
-|--------|----------|-------------|--------|
-| `POST` | `/api/auth/login` | Login, retorna JWT + setea cookie HttpOnly | Público |
-| `POST` | `/api/auth/logout` | Logout, invalida la cookie de sesión | Público |
 
 ---
 
